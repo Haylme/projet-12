@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id ("kotlin-kapt")
-    id ("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "1.6.10"
 }
 
@@ -50,47 +50,50 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+
+    dependencies {
+
+        val activity_version = "1.9.2"
+        val fragment_version = "1.8.3"
+
+
+        implementation(libs.androidx.activity.ktx)
+        implementation(libs.androidx.fragment.ktx.v183)
+
+
+        implementation(libs.jetbrains.kotlinx.serialization.json.v150)
+        implementation(libs.kotlinx.coroutines.core)
+        implementation(libs.retrofit)
+        implementation(libs.converter.gson)
+        implementation(libs.retrofit2.kotlin.coroutines.adapter)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.hilt.android.v244)
+        implementation(libs.hilt.android.compiler)
+
+        testImplementation(libs.mockk)
+        testImplementation(libs.mockito.kotlin)
+        testImplementation(libs.androidx.core.testing)
+
+        implementation(libs.gson)
+
+
+        implementation(libs.androidx.core.ktx)
+        implementation(libs.androidx.lifecycle.runtime.ktx)
+        implementation(libs.androidx.activity.compose)
+        implementation(platform(libs.androidx.compose.bom))
+        implementation(libs.androidx.ui)
+        implementation(libs.androidx.ui.graphics)
+        implementation(libs.androidx.ui.tooling.preview)
+        implementation(libs.androidx.material3)
+        testImplementation(libs.junit)
+        androidTestImplementation(libs.androidx.junit)
+        androidTestImplementation(libs.androidx.espresso.core)
+        androidTestImplementation(platform(libs.androidx.compose.bom))
+        androidTestImplementation(libs.androidx.ui.test.junit4)
+        debugImplementation(libs.androidx.ui.tooling)
+        debugImplementation(libs.androidx.ui.test.manifest)
+    }
 }
 
-dependencies {
 
-    val activity_version = "1.9.2"
-    val fragment_version = "1.8.3"
-
-
-    implementation (libs.androidx.activity.ktx)
-    implementation (libs.androidx.fragment.ktx.v183)
-
-
-    implementation (libs.jetbrains.kotlinx.serialization.json.v150)
-    implementation (libs.kotlinx.coroutines.core)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.retrofit2.kotlin.coroutines.adapter)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.hilt.android.v244)
-    implementation(libs.hilt.android.compiler)
-
-    testImplementation(libs.mockk)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.androidx.core.testing)
-
-    implementation(libs.gson)
-
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-}
