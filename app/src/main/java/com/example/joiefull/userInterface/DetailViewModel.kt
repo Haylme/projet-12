@@ -1,7 +1,12 @@
 package com.example.joiefull.userInterface
 
 import androidx.lifecycle.ViewModel
+import com.example.joiefull.repository.Repository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class DetailViewModel : ViewModel() {
+
+@HiltViewModel
+class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     // TODO: Implement the ViewModel
 }

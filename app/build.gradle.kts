@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 android {
@@ -50,6 +53,30 @@ android {
 }
 
 dependencies {
+
+    val activity_version = "1.9.2"
+    val fragment_version = "1.8.3"
+
+
+    implementation (libs.androidx.activity.ktx)
+    implementation (libs.androidx.fragment.ktx.v183)
+
+
+    implementation (libs.jetbrains.kotlinx.serialization.json.v150)
+    implementation (libs.kotlinx.coroutines.core)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.retrofit2.kotlin.coroutines.adapter)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.hilt.android.v244)
+    implementation(libs.hilt.android.compiler)
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.core.testing)
+
+    implementation(libs.gson)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

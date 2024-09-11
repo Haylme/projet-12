@@ -1,7 +1,6 @@
 package com.example.joiefull.retrofit
 
 import com.example.joiefull.contentData.Clothes
-import com.example.joiefull.contentData.Picture
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

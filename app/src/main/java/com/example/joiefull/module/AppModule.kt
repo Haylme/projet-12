@@ -1,4 +1,4 @@
-package com.example.joiefull
+package com.example.joiefull.module
 
 import com.example.joiefull.retrofit.ApiService
 import com.example.joiefull.retrofit.CallApi
@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 import javax.inject.Singleton
 
 @Module
