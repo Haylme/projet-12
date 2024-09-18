@@ -8,12 +8,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -113,8 +119,23 @@ class HomeFragment : androidx.fragment.app.Fragment() {
 
 }
 
+
 @Composable
-fun HomeUi(clothesData: ClothesItem) {
+fun RecyclerView(itemClothe: List<ClothesItem>, rate: Double) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(itemClothe.size) { index ->
+            HomeUi(clothesData = itemClothe[index], rate = rate)
+        }
+    }
+}
+
+
+@Composable
+fun HomeUi(clothesData: ClothesItem, rate: Double) {
 
 
     Column {
@@ -124,7 +145,7 @@ fun HomeUi(clothesData: ClothesItem) {
             style = MaterialTheme.typography.titleMedium
 
 
-            )
+        )
         Box(
             modifier = Modifier
                 .height(198.dp)
@@ -143,22 +164,25 @@ fun HomeUi(clothesData: ClothesItem) {
                     .padding(8.dp),
                 shape = RoundedCornerShape(4.dp),
 
-            ) {
+                ) {
                 val isClickable by remember {
                     mutableStateOf(false)
                 }
 
 
                 Image(
-                    painter = if(isClickable) {painterResource(id = R.drawable.fav_empty)} else {
-                        painterResource(id = R.drawable.fav_full)},
+                    painter = if (isClickable) {
+                        painterResource(id = R.drawable.fav_empty)
+                    } else {
+                        painterResource(id = R.drawable.fav_full)
+                    },
                     contentDescription = clothesData.picture.description,
                     modifier = Modifier
                         .align(Alignment.Start)
                         .clickable { }
 
 
-                    )
+                )
 
 
 
@@ -174,23 +198,43 @@ fun HomeUi(clothesData: ClothesItem) {
                 )
             }
         }
+        Column {
 
-        Row {
-            Text(
-                text = clothesData.name,
+
+            Row {
+                Text(
+                    text = clothesData.name,
+
+
+                    )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+
+                Image(
+                    painter = painterResource(id = R.drawable.star),
+                    contentDescription = null,
+
+
+                    )
+                Text(
+                    text = rate.toString()
+                )
+
+            }
+            Row {
+
+                Text(
+                    text = clothesData.price.toString()
 
 
                 )
+                Spacer(modifier = Modifier.width(10.dp))
 
-            Spacer(modifier = Modifier.width(10.dp))
-
-
-            Image(
-                painter = painterResource(id = R.drawable.star),
-                contentDescription = null,
+                Text(text = clothesData.originalPrice.toString())
 
 
-                )
+            }
         }
 
 
