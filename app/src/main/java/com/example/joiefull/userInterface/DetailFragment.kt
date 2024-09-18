@@ -14,16 +14,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = DetailFragment()
-    }
+
 
     private val viewModel: DetailViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Use the ViewModel
+
     }
 
     override fun onCreateView(
@@ -37,7 +36,18 @@ class DetailFragment : Fragment() {
         composeView.apply {
 
 
+
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+            setContent {
+
+
+
+
+
+            }
+
+
         }
 
 
@@ -50,6 +60,10 @@ class DetailFragment : Fragment() {
 
 
 
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+        return view
     }
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
 }

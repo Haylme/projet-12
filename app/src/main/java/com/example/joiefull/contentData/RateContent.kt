@@ -1,4 +1,4 @@
 package com.example.joiefull.contentData
 
-data class RateContent(val clotheName: String, val starsRating: Int)
+data class RateContent(val id: Int, val starsRating: Int)
 

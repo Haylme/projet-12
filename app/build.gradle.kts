@@ -50,13 +50,15 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
 
 
     dependencies {
 
-        val activity_version = "1.9.2"
-        val fragment_version = "1.8.3"
+        implementation(libs.coil.compose)
 
+
+        implementation (libs.androidx.navigation.compose)
 
         implementation(libs.androidx.activity.ktx)
         implementation(libs.androidx.fragment.ktx.v183)
@@ -94,6 +96,7 @@ android {
         debugImplementation(libs.androidx.ui.tooling)
         debugImplementation(libs.androidx.ui.test.manifest)
     }
-}
+
+
 
 
