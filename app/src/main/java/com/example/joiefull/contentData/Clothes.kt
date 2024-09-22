@@ -26,3 +26,5 @@ data class Picture(
     @SerialName("description") val description: String,
     @SerialName("url") val url: String
 )
+
+

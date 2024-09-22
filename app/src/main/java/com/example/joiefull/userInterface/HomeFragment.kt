@@ -15,16 +15,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,41 +33,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
+import com.example.joiefull.contentData.Picture
+import com.example.joiefull.contentData.RateContent
+import com.example.joiefull.repository.Repository
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 
 @AndroidEntryPoint
 class HomeFragment : androidx.fragment.app.Fragment() {
 
 
-    private lateinit var cat: String
-    private var lik by Delegates.notNull<Int>()
-    private lateinit var namae: String
-    private var op: Double = 0.0
-    private lateinit var pic: String
-    private var prix: Double = 0.0
+    private val viewModel: HomeViewModel by viewModels()
 
-
-    companion object {
+    companion object
+    {
         fun newInstance() = HomeFragment()
     }
-
-    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Use the ViewModel
+        viewModel.fetchAll()
+        viewModel.getRate()
+
     }
 
     override fun onCreateView(
@@ -79,32 +71,13 @@ class HomeFragment : androidx.fragment.app.Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         val composeView = view.findViewById<ComposeView>(R.id.compose_view_home)
 
-
-        viewModel.fetchAll()
-
-        lifecycleScope.launch {
-
-            viewModel.fullData.collect {
-
-                    result ->
-
-                val fullData = result
-
-            }
-
-        }
-
-
-
-
-
-
         composeView.apply {
 
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
             setContent {
 
+                test(str = "on verra bien")
 
             }
 
@@ -119,16 +92,42 @@ class HomeFragment : androidx.fragment.app.Fragment() {
 
 }
 
+@Composable
+fun test (str: String){
+
+    Text(text = str)
+
+}
+
+
+
+/**
+val clothesItems by viewModel.fullData.collectAsState()
+val rateContent by viewModel.rateContentFlow.collectAsState()
+val sortedItems = viewModel.selectById(clothesItems)
+RecyclerView(
+itemClothe = sortedItems,
+rateContent = rateContent,
+viewModel = viewModel
+)
+**/
+
 
 @Composable
-fun RecyclerView(itemClothe: List<ClothesItem>, rate: Double) {
+fun RecyclerView(
+
+    itemClothe: List<ClothesItem>,
+    rateContent: List<RateContent>,
+    viewModel: HomeViewModel
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(itemClothe.size) { index ->
-            HomeUi(clothesData = itemClothe[index], rate = rate)
+            val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
+            HomeUi(clothesData = itemClothe[index], rate = rate.toDouble())
         }
     }
 }
@@ -242,4 +241,43 @@ fun HomeUi(clothesData: ClothesItem, rate: Double) {
 
 
 }
+
+@Preview
+@Composable
+fun PreviewRecyclerView() {
+    val sampleClothesItems = listOf(
+        ClothesItem(
+            category = "Shirt",
+            id = 1,
+            likes = 100,
+            name = "Casual Shirt",
+            originalPrice = 29.99,
+            picture = Picture(description = "A casual shirt", url = ""),
+            price = 19.99
+        ),
+        ClothesItem(
+            category = "Pants",
+            id = 2,
+            likes = 150,
+            name = "Jeans",
+            originalPrice = 49.99,
+            picture = Picture(description = "A pair of jeans", url = ""),
+            price = 39.99
+        )
+    )
+
+    val sampleRateContent = listOf(
+        RateContent(id = 1, starsRating = 5),
+        RateContent(id = 2, starsRating = 4)
+    )
+
+    RecyclerView(
+        itemClothe = sampleClothesItems, rateContent = sampleRateContent, viewModel = HomeViewModel(
+            Repository()
+        )
+    )
+}
+
+
+
 

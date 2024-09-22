@@ -1,10 +1,23 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.52")
+    }
+}
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "1.6.10"
+
 }
+
+apply(plugin = "com.android.application")
+apply(plugin = "com.google.dagger.hilt.android")
 
 android {
     namespace = "com.example.joiefull"
@@ -22,6 +35,13 @@ android {
             useSupportLibrary = true
         }
     }
+    kapt {
+
+        correctErrorTypes = true
+
+    }
+
+
 
     buildTypes {
         release {
@@ -32,24 +52,37 @@ android {
             )
         }
     }
+
+
+
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
+
     }
     packaging {
+
+
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/gradle/incremental.annotation.processors"
+            )
         }
     }
+
+
+
 }
 
 
@@ -59,6 +92,24 @@ android {
 
 
         implementation (libs.androidx.navigation.compose)
+
+
+
+
+        implementation(libs.androidx.navigation.compose.v281)
+
+        // Views/Fragments integration
+        implementation(libs.androidx.navigation.fragment)
+        implementation(libs.androidx.navigation.ui)
+
+        // Feature module support for Fragments
+        implementation(libs.androidx.navigation.dynamic.features.fragment)
+
+        // Testing Navigation
+        androidTestImplementation(libs.androidx.navigation.testing)
+
+
+
 
         implementation(libs.androidx.activity.ktx)
         implementation(libs.androidx.fragment.ktx.v183)
@@ -70,8 +121,23 @@ android {
         implementation(libs.converter.gson)
         implementation(libs.retrofit2.kotlin.coroutines.adapter)
         implementation(libs.kotlinx.serialization.json)
-        implementation(libs.hilt.android.v244)
-        implementation(libs.hilt.android.compiler)
+
+
+
+
+        implementation ("com.google.dagger:hilt-android:2.52")
+        kapt ("com.google.dagger:hilt-compiler:2.52")
+
+        // For instrumentation tests
+        androidTestImplementation  ("com.google.dagger:hilt-android-testing:2.52")
+        kaptAndroidTest ("com.google.dagger:hilt-compiler:2.52")
+
+        // For local unit tests
+        testImplementation ("com.google.dagger:hilt-android-testing:2.52")
+        kaptTest ("com.google.dagger:hilt-compiler:2.52")
+
+
+
 
         testImplementation(libs.mockk)
         testImplementation(libs.mockito.kotlin)
@@ -98,5 +164,5 @@ android {
     }
 
 
-
+apply(plugin = "dagger.hilt.android.plugin")
 

@@ -1,12 +1,17 @@
 package com.example.joiefull.repository
 
-import com.example.joiefull.contentData.Clothes
+import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.RateContent
+import com.example.joiefull.retrofit.ApiService
 import com.example.joiefull.retrofit.CallApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class Repository {
+
+@Singleton
+class Repository () {
 
     private val _list = mutableListOf<RateContent>()
 
@@ -26,12 +31,12 @@ class Repository {
 
     }
     fun getRatings(): List<RateContent> {
-        return _rateContentFlow.value
+        return rateContentFlow.value
     }
 
 
 
-    suspend fun dataFetch(): Clothes{
+    suspend fun dataFetch(): List<ClothesItem>{
 
         return CallApi.fetchData()
 

@@ -1,5 +1,6 @@
 package com.example.joiefull.module
 
+import com.example.joiefull.repository.Repository
 import com.example.joiefull.retrofit.ApiService
 import com.example.joiefull.retrofit.CallApi
 import dagger.Module
@@ -11,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
 import javax.inject.Singleton
 
 @Module
@@ -23,6 +23,12 @@ object AppModule {
     fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
 
+    @Provides
+    @Singleton
+    fun provideRepository(): Repository {
+        return Repository()
+
+    }
 
 
     @Provides

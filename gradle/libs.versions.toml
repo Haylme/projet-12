@@ -8,12 +8,15 @@ glide = "4.12.0"
 gson = "2.10.1"
 hiltAndroid = "2.51.1"
 hiltAndroidVersion = "2.44"
+hiltCompiler = "1.2.0"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
 jetbrainsKotlinxSerializationJson = "1.5.0"
-kotlin = "1.9.0"
+kotlin = "1.9.25"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinStdlibJdk7 = "1.9.20"
 kotlinxCoroutinesCore = "1.6.4"
 kotlinxCoroutinesTest = "1.9.0-RC"
 kotlinxSerializationJson = "1.6.3"
@@ -27,6 +30,7 @@ fragmentKtx = "1.8.2"
 mockitoKotlin = "5.0.0"
 mockk = "1.9.3"
 navigationCompose = "2.8.0"
+navigationComposeVersion = "2.8.1"
 retrofit = "2.9.0"
 retrofit2KotlinCoroutinesAdapter = "0.9.2"
 retrofit2KotlinxSerializationConverter = "0.8.0"
@@ -36,7 +40,14 @@ androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-fragment-ktx-v183 = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-lifecycle-viewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hiltLifecycleViewmodel" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose-v281 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+androidx-navigation-dynamic-features-fragment = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigationComposeVersion" }
+androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationComposeVersion" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationComposeVersion" }
+androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationComposeVersion" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
@@ -60,18 +71,15 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
-androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
-androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
+
+kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlinStdlibJdk7" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-kotlin-coroutines-adapter = { module = "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter", version.ref = "retrofit2KotlinCoroutinesAdapter" }
-retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

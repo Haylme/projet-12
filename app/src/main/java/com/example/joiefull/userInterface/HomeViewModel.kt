@@ -2,7 +2,6 @@ package com.example.joiefull.userInterface
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.joiefull.contentData.Clothes
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
@@ -20,8 +19,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
 
-    private val _fullData = MutableStateFlow(Clothes())
-    val fullData: StateFlow<Clothes> = _fullData.asStateFlow()
+    private val _fullData = MutableStateFlow<List<ClothesItem>>(emptyList())
+    val fullData: StateFlow<List<ClothesItem>> = _fullData.asStateFlow()
 
 
     val rateContentFlow: StateFlow<List<RateContent>> = repository.rateContentFlow
@@ -32,16 +31,15 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.dataFetch()
 
-
             if (response.isNotEmpty()) {
-
                 _fullData.value = response
-
             }
 
-
         }
+    }
 
+    fun getRate() {
+        repository.getRatings()
 
     }
 
@@ -64,12 +62,8 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
         return response
     }
 
-    fun selectById(
-
-        item: ArrayList<ClothesItem>
-    ): List<ClothesItem> {
-        val result = mutableListOf<ClothesItem>()
-
+    fun selectById(item: List<ClothesItem>): ArrayList<ClothesItem> {
+        val result = arrayListOf<ClothesItem>()
         for (id in 0 until item.size) {
             for (i in item) {
                 if (i.id == id) {
@@ -87,10 +81,8 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                 }
             }
         }
-
         return result
     }
-
 
 
 }
