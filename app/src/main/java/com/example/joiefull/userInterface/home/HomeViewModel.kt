@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
 
     fun selectById(item: List<ClothesItem>): ArrayList<ClothesItem> {
         val result = arrayListOf<ClothesItem>()
-        for (id in 0 until item.size) {
+        for (id in item.indices) {
             for (i in item) {
                 if (i.id == id) {
                     val clothesData = ClothesItem(

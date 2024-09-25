@@ -4,9 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,7 +29,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             JoiefullTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    HomeDisplay()
+                    Box(Modifier.safeDrawingPadding()) {
+                        HomeDisplay()
+                    }
 
                 }
             }
@@ -37,26 +42,26 @@ class MainActivity : ComponentActivity() {
 /**
 @Composable
 fun MyApp(starDestination: String = NavigationItem.Home.route) {
-    val navController = rememberNavController()
-    Surface(color = MaterialTheme.colorScheme.primary) {
-        NavHost(navController = navController, startDestination = starDestination) {
-            composable(NavigationItem.Home.route) {
-                HomeFragment.newInstance()
-            }
-            composable(NavigationItem.Detail.route) {
-                DetailFragment.newInstance()
-            }
-        }
-    }
+val navController = rememberNavController()
+Surface(color = MaterialTheme.colorScheme.primary) {
+NavHost(navController = navController, startDestination = starDestination) {
+composable(NavigationItem.Home.route) {
+HomeFragment.newInstance()
+}
+composable(NavigationItem.Detail.route) {
+DetailFragment.newInstance()
+}
+}
+}
 }
 
 
 enum class Screen {
-    HOME,
-    DETAIL,
+HOME,
+DETAIL,
 }
 
 sealed class NavigationItem(val route: String) {
-    object Home : NavigationItem(Screen.HOME.name)
-    object Detail : NavigationItem(Screen.DETAIL.name)
+object Home : NavigationItem(Screen.HOME.name)
+object Detail : NavigationItem(Screen.DETAIL.name)
 }**/

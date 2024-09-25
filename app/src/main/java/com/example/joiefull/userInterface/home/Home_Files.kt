@@ -70,8 +70,10 @@ fun RecyclerView(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
-        modifier = Modifier.fillMaxSize()
+        contentPadding = PaddingValues(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp)
     ) {
         items(itemClothe.size) { index ->
             val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
@@ -82,7 +84,7 @@ fun RecyclerView(
 
 
 @Composable
-fun HomeUi(clothesData: ClothesItem, rate: Double) {
+fun HomeUi(clothesData: ClothesItem, rate: Double, modifier:Modifier = Modifier) {
 
 
     Column {
@@ -101,7 +103,10 @@ fun HomeUi(clothesData: ClothesItem, rate: Double) {
             AsyncImage(
                 model = clothesData.picture.url,
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp))
+
             )
 
 
@@ -116,33 +121,29 @@ fun HomeUi(clothesData: ClothesItem, rate: Double) {
                     mutableStateOf(false)
                 }
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Image(
+                        painter = if (isClickable) {
+                            painterResource(id = R.drawable.fav_empty)
+                        } else {
+                            painterResource(id = R.drawable.fav_full)
+                        },
+                        contentDescription = clothesData.picture.description,
+                        modifier = Modifier
+                            .clickable { }
+                    )
 
-                Image(
-                    painter = if (isClickable) {
-                        painterResource(id = R.drawable.fav_empty)
-                    } else {
-                        painterResource(id = R.drawable.fav_full)
-                    },
-                    contentDescription = clothesData.picture.description,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .clickable { }
+                    Spacer(modifier = Modifier.width(8.dp))
 
-
-                )
-
-
-
-                Text(
-                    text = clothesData.likes.toString(),
-
-
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(8.dp),
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                    Text(
+                        text = clothesData.likes.toString(),
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
         Column {
