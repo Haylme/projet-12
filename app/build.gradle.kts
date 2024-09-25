@@ -97,15 +97,9 @@ android {
 
 
         implementation(libs.androidx.navigation.compose.v281)
-
-        // Views/Fragments integration
         implementation(libs.androidx.navigation.fragment)
         implementation(libs.androidx.navigation.ui)
-
-        // Feature module support for Fragments
         implementation(libs.androidx.navigation.dynamic.features.fragment)
-
-        // Testing Navigation
         androidTestImplementation(libs.androidx.navigation.testing)
 
 
@@ -124,6 +118,14 @@ android {
 
 
 
+        implementation(libs.androidx.fragment)
+
+        implementation(libs.androidx.fragment.compose)
+
+        debugImplementation(libs.androidx.fragment.testing)
+
+
+        implementation(("androidx.hilt:hilt-navigation-compose:1.0.0"))
 
         implementation ("com.google.dagger:hilt-android:2.52")
         kapt ("com.google.dagger:hilt-compiler:2.52")

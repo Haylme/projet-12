@@ -1,4 +1,4 @@
-package com.example.joiefull.userInterface
+package com.example.joiefull.userInterface.detail
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -17,6 +17,10 @@ class DetailFragment : Fragment() {
 
 
     private val viewModel: DetailViewModel by viewModels()
+
+    companion object {
+        fun newInstance() = DetailFragment()
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

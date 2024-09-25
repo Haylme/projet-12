@@ -1,9 +1,5 @@
-package com.example.joiefull.userInterface
+package com.example.joiefull.userInterface.home
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -30,87 +26,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
 import com.example.joiefull.repository.Repository
-import dagger.hilt.android.AndroidEntryPoint
-
-
-@AndroidEntryPoint
-class HomeFragment : androidx.fragment.app.Fragment() {
-
-
-    private val viewModel: HomeViewModel by viewModels()
-
-    companion object
-    {
-        fun newInstance() = HomeFragment()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel.fetchAll()
-        viewModel.getRate()
-
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        val composeView = view.findViewById<ComposeView>(R.id.compose_view_home)
-
-        composeView.apply {
-
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
-            setContent {
-
-                test(str = "on verra bien")
-
-            }
-
-        }
-
-        return view
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-}
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
-fun test (str: String){
+fun HomeDisplay (viewModel: HomeViewModel = hiltViewModel()){
 
-    Text(text = str)
+    viewModel.fetchAll()
+    viewModel.getRate()
 
+    val clothesItemsState = viewModel.fullData.collectAsState()
+    val rateContent = viewModel.rateContentFlow.collectAsState()
+
+
+    val clothesItems = clothesItemsState.value
+    val sortedItems = viewModel.selectById(clothesItems)
+
+    val rateData = rateContent.value
+
+    RecyclerView(
+        itemClothe = sortedItems,
+        rateContent = rateData
+
+    )
 }
-
-
-
-/**
-val clothesItems by viewModel.fullData.collectAsState()
-val rateContent by viewModel.rateContentFlow.collectAsState()
-val sortedItems = viewModel.selectById(clothesItems)
-RecyclerView(
-itemClothe = sortedItems,
-rateContent = rateContent,
-viewModel = viewModel
-)
-**/
 
 
 @Composable
@@ -118,7 +66,7 @@ fun RecyclerView(
 
     itemClothe: List<ClothesItem>,
     rateContent: List<RateContent>,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -271,13 +219,9 @@ fun PreviewRecyclerView() {
         RateContent(id = 2, starsRating = 4)
     )
 
-    RecyclerView(
+   RecyclerView(
         itemClothe = sampleClothesItems, rateContent = sampleRateContent, viewModel = HomeViewModel(
             Repository()
         )
     )
 }
-
-
-
-

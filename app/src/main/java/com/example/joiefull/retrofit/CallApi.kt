@@ -16,7 +16,9 @@ object CallApi {
             if (response.isSuccessful) {
                 val clothes: Clothes = response.body() ?: throw IllegalStateException("Received null as response")
                 val clothesList: List<ClothesItem> = clothes.toList()
-                clothesList.sortedBy { it.id }
+
+
+                return@withContext clothesList
             } else {
                 throw IllegalStateException(
                     "Failed to fetch data: ${response.errorBody()?.string()}"

@@ -1,4 +1,4 @@
-package com.example.joiefull.userInterface
+package com.example.joiefull.userInterface.detail
 
 import androidx.lifecycle.ViewModel
 import com.example.joiefull.contentData.RateContent

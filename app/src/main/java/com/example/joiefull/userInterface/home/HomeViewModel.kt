@@ -1,4 +1,4 @@
-package com.example.joiefull.userInterface
+package com.example.joiefull.userInterface.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,20 +46,28 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
 
     fun rate(clothesId: Int, usersRating: List<RateContent>): Int {
 
+        val response :Int
         var sum = 0
         val totalSize = usersRating.size
 
 
+        if (totalSize > 0) {
+            for (item in usersRating) {
+                if (item.id == clothesId) {
 
-        for (item in usersRating) {
-            if (item.id == clothesId) {
-
-                sum += item.starsRating
+                    sum += item.starsRating
+                }
             }
-        }
-        val response = sum / totalSize
+             response = sum / totalSize
 
+
+        }else {
+            response = 0
+
+
+        }
         return response
+
     }
 
     fun selectById(item: List<ClothesItem>): ArrayList<ClothesItem> {
