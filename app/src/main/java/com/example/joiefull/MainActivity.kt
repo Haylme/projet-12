@@ -1,5 +1,6 @@
 package com.example.joiefull
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,15 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.joiefull.ui.theme.JoiefullTheme
-
+import com.example.joiefull.userInterface.detail.DetailScreen
 import com.example.joiefull.userInterface.home.HomeDisplay
-
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -28,40 +29,45 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             JoiefullTheme {
+
+
                 Surface(color = MaterialTheme.colorScheme.background) {
                     Box(Modifier.safeDrawingPadding()) {
-                        HomeDisplay()
-                    }
+                        val navController = rememberNavController()
+                        NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
+                            composable(NavigationItem.Home.route) {
+                                HomeDisplay(navController = navController)
+                            }
 
+                            composable(
+                               "detail/{clothesId}",
+                                arguments = listOf(navArgument("clothesId") {
+
+                                    type = NavType.IntType
+                                })
+                            ) { backStackEntry ->
+                                val clothesId = backStackEntry.arguments?.getInt("clothesId")
+                                if (clothesId != null) {
+                                    DetailScreen(clothesId)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-/**
-@Composable
-fun MyApp(starDestination: String = NavigationItem.Home.route) {
-val navController = rememberNavController()
-Surface(color = MaterialTheme.colorScheme.primary) {
-NavHost(navController = navController, startDestination = starDestination) {
-composable(NavigationItem.Home.route) {
-HomeFragment.newInstance()
-}
-composable(NavigationItem.Detail.route) {
-DetailFragment.newInstance()
-}
-}
-}
-}
-
-
 enum class Screen {
-HOME,
-DETAIL,
+    HOME,
+    DETAIL,
 }
 
 sealed class NavigationItem(val route: String) {
-object Home : NavigationItem(Screen.HOME.name)
-object Detail : NavigationItem(Screen.DETAIL.name)
-}**/
+    object Home : NavigationItem(Screen.HOME.name)
+    object Detail : NavigationItem(Screen.DETAIL.name)
+}
+
+
+

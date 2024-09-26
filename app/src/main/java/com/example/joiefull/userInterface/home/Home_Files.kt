@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,16 +31,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
-import com.example.joiefull.repository.Repository
-import dagger.hilt.android.lifecycle.HiltViewModel
+
+
 
 @Composable
-fun HomeDisplay (viewModel: HomeViewModel = hiltViewModel()){
+fun HomeDisplay(viewModel: HomeViewModel = hiltViewModel(), navController: NavController) {
 
     viewModel.fetchAll()
     viewModel.getRate()
@@ -55,7 +59,8 @@ fun HomeDisplay (viewModel: HomeViewModel = hiltViewModel()){
 
     RecyclerView(
         itemClothe = sortedItems,
-        rateContent = rateData
+        rateContent = rateData,
+        navController = navController
 
     )
 }
@@ -66,7 +71,8 @@ fun RecyclerView(
 
     itemClothe: List<ClothesItem>,
     rateContent: List<RateContent>,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -77,14 +83,25 @@ fun RecyclerView(
     ) {
         items(itemClothe.size) { index ->
             val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
-            HomeUi(clothesData = itemClothe[index], rate = rate.toDouble())
+            HomeUi(
+                clothesData = itemClothe[index],
+                rate = rate.toDouble(),
+                navController = navController
+
+
+            )
         }
     }
 }
 
 
 @Composable
-fun HomeUi(clothesData: ClothesItem, rate: Double, modifier:Modifier = Modifier) {
+fun HomeUi(
+    clothesData: ClothesItem,
+    rate: Double,
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
 
 
     Column {
@@ -98,14 +115,18 @@ fun HomeUi(clothesData: ClothesItem, rate: Double, modifier:Modifier = Modifier)
         Box(
             modifier = Modifier
                 .height(198.dp)
-                .clip(RoundedCornerShape(8.dp))
+
         ) {
             AsyncImage(
                 model = clothesData.picture.url,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable {
+                        navController.navigate("detail/${clothesData.id}")
+                    }
+
 
             )
 
@@ -114,10 +135,10 @@ fun HomeUi(clothesData: ClothesItem, rate: Double, modifier:Modifier = Modifier)
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp),
-                shape = RoundedCornerShape(4.dp),
+                shape = RoundedCornerShape(34.dp),
 
                 ) {
-                val isClickable by remember {
+                var isClickable by remember {
                     mutableStateOf(false)
                 }
 
@@ -126,14 +147,14 @@ fun HomeUi(clothesData: ClothesItem, rate: Double, modifier:Modifier = Modifier)
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Image(
-                        painter = if (isClickable) {
+                        painter = if (!isClickable) {
                             painterResource(id = R.drawable.fav_empty)
                         } else {
                             painterResource(id = R.drawable.fav_full)
                         },
                         contentDescription = clothesData.picture.description,
                         modifier = Modifier
-                            .clickable { }
+                            .clickable { isClickable = !isClickable }
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -220,9 +241,13 @@ fun PreviewRecyclerView() {
         RateContent(id = 2, starsRating = 4)
     )
 
-   RecyclerView(
-        itemClothe = sampleClothesItems, rateContent = sampleRateContent, viewModel = HomeViewModel(
-            Repository()
-        )
+
+    val navController = rememberNavController()
+
+    RecyclerView(
+        itemClothe = sampleClothesItems,
+        rateContent = sampleRateContent,
+        navController = navController
     )
+
 }

@@ -86,9 +86,12 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                     )
                     result.add(clothesData)
                     break
+
+
                 }
             }
         }
+        result.sortedBy { it.category }
         return result
     }
 
