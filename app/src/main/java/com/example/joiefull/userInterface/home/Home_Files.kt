@@ -34,12 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
-
 
 
 @Composable
@@ -55,12 +53,14 @@ fun HomeDisplay(viewModel: HomeViewModel = hiltViewModel(), navController: NavCo
     val clothesItems = clothesItemsState.value
     val sortedItems = viewModel.selectById(clothesItems)
 
+    val sortByCategory = sortedItems.sortedBy { it.category }
+
     val rateData = rateContent.value
 
     RecyclerView(
-        itemClothe = sortedItems,
+        itemClothe = sortByCategory,
         rateContent = rateData,
-        navController = navController
+        navController =  navController
 
     )
 }
@@ -99,7 +99,7 @@ fun RecyclerView(
 fun HomeUi(
     clothesData: ClothesItem,
     rate: Double,
-    modifier: Modifier = Modifier,
+
     navController: NavController
 ) {
 
@@ -200,7 +200,7 @@ fun HomeUi(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
-                Text(text = clothesData.originalPrice.toString())
+                Text(text = clothesData.original_price.toString())
 
 
             }
@@ -221,7 +221,7 @@ fun PreviewRecyclerView() {
             id = 1,
             likes = 100,
             name = "Casual Shirt",
-            originalPrice = 29.99,
+            original_price = 29.99,
             picture = Picture(description = "A casual shirt", url = ""),
             price = 19.99
         ),
@@ -230,7 +230,7 @@ fun PreviewRecyclerView() {
             id = 2,
             likes = 150,
             name = "Jeans",
-            originalPrice = 49.99,
+            original_price = 49.99,
             picture = Picture(description = "A pair of jeans", url = ""),
             price = 39.99
         )

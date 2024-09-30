@@ -139,6 +139,7 @@ android {
         kaptTest ("com.google.dagger:hilt-compiler:2.52")
 
 
+        implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha03")
 
 
         testImplementation(libs.mockk)

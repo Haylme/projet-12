@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                         id = i.id,
                         likes = i.likes,
                         name = i.name,
-                        originalPrice = i.originalPrice,
+                        original_price = i.original_price,
                         picture = Picture(description = i.picture.description, url = i.picture.url),
                         price = i.price
                     )

@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 import com.example.joiefull.ui.theme.JoiefullTheme
 import com.example.joiefull.userInterface.detail.DetailScreen
 import com.example.joiefull.userInterface.home.HomeDisplay
@@ -34,19 +36,22 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     Box(Modifier.safeDrawingPadding()) {
                         val navController = rememberNavController()
-                        NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
+                        NavHost(
+                            navController = navController,
+                            startDestination = NavigationItem.Home.route
+                        ) {
                             composable(NavigationItem.Home.route) {
                                 HomeDisplay(navController = navController)
                             }
 
                             composable(
-                               "detail/{clothesId}",
+                                "detail/{clothesId}",
                                 arguments = listOf(navArgument("clothesId") {
 
                                     type = NavType.IntType
                                 })
-                            ) { backStackEntry ->
-                                val clothesId = backStackEntry.arguments?.getInt("clothesId")
+                            ) {
+                                val clothesId = it.arguments?.getInt("clothesId")
                                 if (clothesId != null) {
                                     DetailScreen(clothesId)
                                 }
@@ -68,6 +73,7 @@ sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
     object Detail : NavigationItem(Screen.DETAIL.name)
 }
+
 
 
 

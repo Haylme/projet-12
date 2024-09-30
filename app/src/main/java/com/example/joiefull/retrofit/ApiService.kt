@@ -8,7 +8,7 @@ import retrofit2.http.GET
 
 interface ApiService {
 
-    @GET("api/clothes.json")
+    @GET("clothes.json")
     suspend fun getvalue (): Response<Clothes>
 
 
@@ -19,7 +19,7 @@ interface ApiService {
 
 
 
-        const val api = "https://raw.githubusercontent.com/OpenClassrooms-Student-Center/D-velopper-une-interface-accessible-en-Jetpack-Compose/main/"
+        const val api = "https://raw.githubusercontent.com/OpenClassrooms-Student-Center/D-velopper-une-interface-accessible-en-Jetpack-Compose/main/api/"
 
         val retrofit : Retrofit = Retrofit.Builder()
             .baseUrl(api)

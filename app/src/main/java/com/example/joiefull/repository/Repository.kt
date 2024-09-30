@@ -24,9 +24,9 @@ class Repository () {
     private val _rateContentFlow = MutableStateFlow<List<RateContent>>(_list)
     val rateContentFlow : StateFlow<List<RateContent>> get()  = _rateContentFlow
 
-    fun addRating (clotheName: Int, starsRating: Int){
+    fun addRating (clotheId: Int, starsRating: Int){
 
-        _list.add(RateContent(clotheName,starsRating))
+        _list.add(RateContent(clotheId,starsRating))
         _rateContentFlow.value = _list.toList()
 
     }

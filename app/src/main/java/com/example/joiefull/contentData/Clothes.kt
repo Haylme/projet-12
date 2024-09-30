@@ -16,7 +16,7 @@ data class ClothesItem(
     @SerialName("id") val id: Int,
     @SerialName("likes") val likes: Int,
     @SerialName("name") val name: String,
-    @SerialName("original_price") val originalPrice: Double,
+    @SerialName("original_price") val original_price: Double,
     @SerialName("picture") val picture: Picture,
     @SerialName("price") val price: Double
 )
