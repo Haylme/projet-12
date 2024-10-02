@@ -2,14 +2,17 @@ package com.example.joiefull.userInterface.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,9 +30,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.layoutId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -60,7 +70,7 @@ fun HomeDisplay(viewModel: HomeViewModel = hiltViewModel(), navController: NavCo
     RecyclerView(
         itemClothe = sortByCategory,
         rateContent = rateData,
-        navController =  navController
+        navController = navController
 
     )
 }
@@ -76,11 +86,13 @@ fun RecyclerView(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp)
-    ) {
+        Modifier
+            .padding(top = 10.dp)
+            .fillMaxWidth()
+            .fillMaxHeight(),
+
+
+        ) {
         items(itemClothe.size) { index ->
             val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
             HomeUi(
@@ -94,7 +106,6 @@ fun RecyclerView(
     }
 }
 
-
 @Composable
 fun HomeUi(
     clothesData: ClothesItem,
@@ -103,114 +114,215 @@ fun HomeUi(
     navController: NavController
 ) {
 
+    ConstraintLayout(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
 
-    Column {
+    ) {
 
-        Text(
-            text = clothesData.category,
-            style = MaterialTheme.typography.titleMedium
+        val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes) = createRefs()
 
 
-        )
-        Box(
+        Column(verticalArrangement = Arrangement.SpaceBetween,
+
             modifier = Modifier
-                .height(198.dp)
+
+                .constrainAs(categoryClothes) {
+                    top.linkTo(parent.top)
+                    start.linkTo(image.start)
+                    end.linkTo(image.end)
+                }
+
+                .constrainAs(nameClothes) {
+                    top.linkTo(image.bottom)
+                    start.linkTo(image.start)
+                    end.linkTo(parent.end)
+
+                }
+
+                .constrainAs(priceClothes) {
+
+                    top.linkTo(nameClothes.bottom)
+                    start.linkTo(image.start)
+                    end.linkTo(parent.end)
+
+                }
+                .constrainAs(originalPriceClothes) {
+                    top.linkTo(rating.bottom)
+                    end.linkTo(image.end)
+                    start.linkTo(rating.start)
+
+
+                }
+
 
         ) {
-            AsyncImage(
-                model = clothesData.picture.url,
-                contentDescription = null,
+
+            Text(
+
+
+                text = clothesData.category,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.layoutId(categoryClothes)
+
+
+            )
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .size(198.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .clickable {
                         navController.navigate("detail/${clothesData.id}")
                     }
+                    .layoutId("image")
 
-
-            )
-
-
-            Card(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp),
-                shape = RoundedCornerShape(34.dp),
-
-                ) {
-                var isClickable by remember {
-                    mutableStateOf(false)
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Image(
-                        painter = if (!isClickable) {
-                            painterResource(id = R.drawable.fav_empty)
-                        } else {
-                            painterResource(id = R.drawable.fav_full)
-                        },
-                        contentDescription = clothesData.picture.description,
-                        modifier = Modifier
-                            .clickable { isClickable = !isClickable }
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = clothesData.likes.toString(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-        Column {
-
-
-            Row {
-                Text(
-                    text = clothesData.name,
-
-
-                    )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-
-                Image(
-                    painter = painterResource(id = R.drawable.star),
+            ) {
+                AsyncImage(
+                    model = clothesData.picture.url,
                     contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+
+                        .clickable {
+                            navController.navigate("detail/${clothesData.id}")
+                        },
+                    contentScale = ContentScale.Crop
 
 
-                    )
-                Text(
-                    text = rate.toString()
                 )
 
+
+                Card(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .height(27.dp)
+                        .width(51.dp),
+                    shape = RoundedCornerShape(34.dp),
+
+                    ) {
+                    var isClickable by remember {
+                        mutableStateOf(false)
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Image(
+                            painter = if (!isClickable) {
+                                painterResource(id = R.drawable.fav_empty)
+                            } else {
+                                painterResource(id = R.drawable.fav_full)
+                            },
+                            contentDescription = clothesData.picture.description,
+                            modifier = Modifier
+                                .clickable { isClickable = !isClickable }
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = clothesData.likes.toString(),
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
-            Row {
 
-                Text(
-                    text = clothesData.price.toString()
+
+            Column(
+
+                modifier = Modifier.padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy((-8).dp)
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .width(198.dp),
 
 
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                {
 
-                Text(text = clothesData.original_price.toString())
+                    fun truncateText(text: String, maxLength: Int): String {
+                        return if (text.length > maxLength) {
+                            text.take(maxLength) + ".."
+                        } else {
+                            text
+                        }
+                    }
 
 
+                    Row {
+                        Text(
+                            text = truncateText(clothesData.name,16),
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .layoutId(nameClothes)
+                                .weight(1f)
+
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+
+                        Image(
+                            painter = painterResource(id = R.drawable.star),
+                            contentDescription = null,
+
+
+                            )
+                        Text(
+                            text = rate.toString(),
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .layoutId(rating)
+                        )
+
+                    }
+                }
+
+
+                Box(modifier = Modifier
+                    .width(198.dp)
+
+
+                 ) {
+                    Row {
+
+                        Text(
+                            text = clothesData.price.toString(),
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .layoutId(priceClothes)
+
+
+                        )
+                        Spacer(modifier = Modifier.width(18.dp))
+
+                        Text(
+                            text = clothesData.original_price.toString(),
+                            textDecoration = TextDecoration.LineThrough,
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .layoutId(originalPriceClothes)
+                        )
+
+                    }
+                }
             }
         }
 
 
     }
-
-
 }
+
 
 @Preview
 @Composable
@@ -251,3 +363,31 @@ fun PreviewRecyclerView() {
     )
 
 }
+/**
+(
+
+constraintSet = ConstraintSet {
+
+val image = createRefFor("image")
+val nameClothes = createRefFor("nameClothes")
+val priceClothes = createRefFor("priceClothes")
+val originalPriceClothes = createRefFor("originalPriceClothes")
+val rating = createRefFor("rating")
+val star = createRefFor("star")
+val categoryClothes = createRefFor("categoryClothes")
+
+constrain(image) {
+top.linkTo(parent.top)
+start.linkTo(parent.start)
+}
+
+constrain(categoryClothes) {
+start.linkTo(image.start)
+bottom.linkTo(image.top)
+
+}
+
+}
+
+
+)**/
