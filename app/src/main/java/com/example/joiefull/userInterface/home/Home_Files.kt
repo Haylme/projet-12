@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
@@ -90,7 +92,7 @@ fun RecyclerView(
             .padding(top = 10.dp)
             .fillMaxWidth()
             .fillMaxHeight(),
-
+        horizontalArrangement = Arrangement.Center
 
         ) {
         items(itemClothe.size) { index ->
@@ -124,7 +126,8 @@ fun HomeUi(
         val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes) = createRefs()
 
 
-        Column(verticalArrangement = Arrangement.SpaceBetween,
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
 
             modifier = Modifier
 
@@ -150,8 +153,8 @@ fun HomeUi(
                 }
                 .constrainAs(originalPriceClothes) {
                     top.linkTo(rating.bottom)
-                    end.linkTo(image.end)
-                    start.linkTo(rating.start)
+                    end.linkTo(parent.end)
+                    start.linkTo(priceClothes.end)
 
 
                 }
@@ -164,7 +167,9 @@ fun HomeUi(
 
                 text = clothesData.category,
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.layoutId(categoryClothes)
+                modifier = Modifier
+                    .layoutId(categoryClothes)
+                    .padding(start = 8.dp)
 
 
             )
@@ -184,6 +189,7 @@ fun HomeUi(
                     modifier = Modifier
                         .fillMaxSize()
 
+
                         .clickable {
                             navController.navigate("detail/${clothesData.id}")
                         },
@@ -198,7 +204,7 @@ fun HomeUi(
                         .align(Alignment.BottomEnd)
                         .padding(8.dp)
                         .height(27.dp)
-                        .width(51.dp),
+                        .widthIn(51.dp),
                     shape = RoundedCornerShape(34.dp),
 
                     ) {
@@ -208,7 +214,7 @@ fun HomeUi(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Image(
                             painter = if (!isClickable) {
@@ -236,16 +242,17 @@ fun HomeUi(
             Column(
 
                 modifier = Modifier.padding(top = 8.dp),
-                verticalArrangement = Arrangement.spacedBy((-8).dp)
-            ) {
+                verticalArrangement = Arrangement.spacedBy((-8).dp),
+
+                ) {
 
                 Box(
                     modifier = Modifier
-                        .padding(top = 8.dp)
+
                         .width(198.dp),
 
 
-                )
+                    )
                 {
 
                     fun truncateText(text: String, maxLength: Int): String {
@@ -259,13 +266,14 @@ fun HomeUi(
 
                     Row {
                         Text(
-                            text = truncateText(clothesData.name,16),
+                            text = truncateText(clothesData.name, 16),
                             fontSize = 12.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .layoutId(nameClothes)
                                 .weight(1f)
+                                .padding(start = 4.dp)
 
                         )
 
@@ -289,22 +297,31 @@ fun HomeUi(
                 }
 
 
-                Box(modifier = Modifier
-                    .width(198.dp)
+                Box(
+                    modifier = Modifier
+                          .width(198.dp),
 
 
-                 ) {
-                    Row {
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+
+
+                    ) {
 
                         Text(
                             text = clothesData.price.toString(),
                             fontSize = 12.sp,
                             modifier = Modifier
                                 .layoutId(priceClothes)
+                                .padding(start = 4.dp)
 
 
                         )
                         Spacer(modifier = Modifier.width(18.dp))
+
 
                         Text(
                             text = clothesData.original_price.toString(),
@@ -312,15 +329,19 @@ fun HomeUi(
                             fontSize = 12.sp,
                             modifier = Modifier
                                 .layoutId(originalPriceClothes)
+                                .padding(end = 4.dp)
+
                         )
 
                     }
+
+
                 }
             }
         }
-
-
     }
+
+
 }
 
 
