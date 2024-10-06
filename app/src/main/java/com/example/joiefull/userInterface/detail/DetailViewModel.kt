@@ -19,10 +19,8 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
 
-
     private val _fullData = MutableStateFlow<List<ClothesItem>>(emptyList())
     val fullData: StateFlow<List<ClothesItem>> = _fullData.asStateFlow()
-
 
 
     val rateContentFlow: StateFlow<List<RateContent>> = repository.rateContentFlow
@@ -40,21 +38,18 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     }
 
 
-
-
     fun getRate() {
         repository.getRatings()
 
     }
 
 
+    fun rate(clothesId: Int, usersRating: List<RateContent>): Double {
 
-    fun rate(clothesId: Int, usersRating: List<RateContent>): Int {
-
-        val response :Int
-        var sum = 0
+        val response: Double
+        var sum = 0.0
         val totalSize = usersRating.size
-
+        val dataSize = usersRating.filter { it.id == clothesId }.size
 
         if (totalSize > 0) {
             for (item in usersRating) {
@@ -63,11 +58,11 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
                     sum += item.starsRating
                 }
             }
-            response = sum / totalSize
+            response = sum / dataSize
 
 
-        }else {
-            response = 0
+        } else {
+            response = 0.0
 
 
         }
@@ -75,12 +70,12 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     }
 
-    fun selectById(idClothe:Int,item: List<ClothesItem>): ArrayList<ClothesItem> {
+    fun selectById(idClothe: Int, item: List<ClothesItem>): ArrayList<ClothesItem> {
         val result = arrayListOf<ClothesItem>()
         for (id in item.indices) {
             for (i in item) {
                 if (i.id == idClothe) {
-                    val clothesData = ClothesItem(
+                    val clotheData = ClothesItem(
                         category = i.category,
                         id = i.id,
                         likes = i.likes,
@@ -89,7 +84,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
                         picture = Picture(description = i.picture.description, url = i.picture.url),
                         price = i.price
                     )
-                    result.add(clothesData)
+                    result.add(clotheData)
                     break
 
 
@@ -101,9 +96,8 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     }
 
 
-
-    fun add (clothesId: Int, starsRating: Int){
-        repository.addRating(clothesId,starsRating)
+    fun add(clothesId: Int, starsRating: Int) {
+        repository.addRating(clothesId, starsRating)
 
     }
 

@@ -13,3 +13,5 @@ val Orange = Color(0xFFF99F43)
 
 val white = Color(color = 0xffffffff)
 val black = Color(color = 0xff000000)
+
+val grey = Color(color = 0xff878787)

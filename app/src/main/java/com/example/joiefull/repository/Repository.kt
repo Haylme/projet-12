@@ -14,15 +14,9 @@ import javax.inject.Singleton
 class Repository () {
 
     private val _list = mutableListOf<RateContent>()
-
-
-
-
-
-
-
     private val _rateContentFlow = MutableStateFlow<List<RateContent>>(_list)
     val rateContentFlow : StateFlow<List<RateContent>> get()  = _rateContentFlow
+
 
     fun addRating (clotheId: Int, starsRating: Int){
 

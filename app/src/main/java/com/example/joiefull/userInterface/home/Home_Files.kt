@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
@@ -188,8 +187,6 @@ fun HomeUi(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
-
-
                         .clickable {
                             navController.navigate("detail/${clothesData.id}")
                         },
@@ -257,14 +254,19 @@ fun HomeUi(
 
                     fun truncateText(text: String, maxLength: Int): String {
                         return if (text.length > maxLength) {
-                            text.take(maxLength) + ".."
+                            text.take(maxLength) + ""
                         } else {
                             text
                         }
                     }
 
 
-                    Row {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+
+                    ) {
                         Text(
                             text = truncateText(clothesData.name, 16),
                             fontSize = 12.sp,
@@ -283,6 +285,9 @@ fun HomeUi(
                         Image(
                             painter = painterResource(id = R.drawable.star),
                             contentDescription = null,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .padding(top = 4.dp)
 
 
                             )
