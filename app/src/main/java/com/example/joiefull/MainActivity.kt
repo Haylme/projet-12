@@ -56,6 +56,12 @@ class MainActivity : ComponentActivity() {
                                     DetailScreen(clothesId)
                                 }
                             }
+                            composable(route = "home")
+
+                            {  }
+
+
+
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.joiefull.userInterface.detail
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,33 +27,42 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.fragment.app.FragmentManager.BackStackEntry
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.RateContent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -62,17 +72,21 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
 
     val clothesFullData = viewmodel.fullData.collectAsState()
 
-    val rateContent = viewmodel.rateContentFlow.collectAsState(initial = emptyList())
+    // val rateContent = viewmodel.rateContentFlow.collectAsState(initial = emptyList())
 
     val fullDataClothes = clothesFullData.value
 
-    val rate = rateContent.value
+    // val rate = rateContent.value
 
 
     val dataById = viewmodel.selectById(clothesId, fullDataClothes)
 
 
-    DetailId(itemClothe = dataById, clothesId = clothesId, rateContent = rate)
+    DetailId(
+        itemClothe = dataById,
+        clothesId = clothesId,
+        navController = NavController(LocalContext.current)
+    )
 
 
 }
@@ -80,15 +94,21 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
 
 @Composable
 fun DetailId(
-    itemClothe: List<ClothesItem>,
-    clothesId: Int,
-    rateContent: List<RateContent>,
-    viewModel: DetailViewModel = hiltViewModel()
+    itemClothe: List<ClothesItem>, clothesId: Int,
+    //rateContent: List<RateContent>,
+    viewModel: DetailViewModel = hiltViewModel(), navController: NavController
 ) {
-    val rateData by viewModel.rateContentFlow.collectAsState(initial = emptyList())
+    val scope = rememberCoroutineScope()
+
+    viewModel.getRate()
+    val rateData = viewModel.rateContentFlow.collectAsState(initial = emptyList())
+
+    val rateValue = rateData.value
 
     val clotheData = itemClothe.find { it.id == clothesId }
-    val rate = viewModel.rate(clothesId, rateContent)
+
+
+    var rate = viewModel.rate(clothesId, rateValue)
 
     var starsCount by remember { mutableIntStateOf(0) }
 
@@ -107,14 +127,13 @@ fun DetailId(
             ) {
                 val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes, textField, editTextField, profilpicture, allStars) = createRefs()
 
-                Box(
-                    modifier = Modifier
-                        .size(width = 328.dp, height = 431.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .constrainAs(image) {
-                            top.linkTo(parent.top)
+                Box(modifier = Modifier
+                    .size(width = 328.dp, height = 431.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .constrainAs(image) {
+                        top.linkTo(parent.top)
 
-                        }
+                    }
 
                 ) {
                     if (clotheData != null) {
@@ -125,6 +144,31 @@ fun DetailId(
                             contentScale = ContentScale.Crop
                         )
                     }
+
+                    Icon(painter = painterResource(id = R.drawable.arrow_back),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(12.dp)
+                            .clickable {
+
+                                navController.navigate("home")
+
+                            }
+
+
+                    )
+
+                    Icon(painter = painterResource(id = R.drawable.share),
+                        contentDescription = null,
+
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(12.dp)
+                            .clickable {
+
+
+                            })
 
                     Card(
                         modifier = Modifier
@@ -142,15 +186,13 @@ fun DetailId(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             if (clotheData != null) {
-                                Image(
-                                    painter = if (!isClickable) {
-                                        painterResource(id = R.drawable.fav_empty)
-                                    } else {
-                                        painterResource(id = R.drawable.fav_full)
-                                    },
+                                Image(painter = if (!isClickable) {
+                                    painterResource(id = R.drawable.fav_empty)
+                                } else {
+                                    painterResource(id = R.drawable.fav_full)
+                                },
                                     contentDescription = clotheData.picture.description,
-                                    modifier = Modifier.clickable { isClickable = !isClickable }
-                                )
+                                    modifier = Modifier.clickable { isClickable = !isClickable })
                             }
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -166,20 +208,17 @@ fun DetailId(
                     }
                 }
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy((-8).dp),
+                Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .constrainAs(categoryClothes) {
                             top.linkTo(image.bottom)
-                        }
-                ) {
+                        }) {
 
                     Row(
                         modifier = Modifier
 
-                            .width(328.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .width(328.dp), horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         if (clotheData != null) {
                             Text(
@@ -196,8 +235,7 @@ fun DetailId(
 
 
                         Row(
-                            modifier = Modifier
-                                .padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp)
 
                         ) {
 
@@ -250,8 +288,7 @@ fun DetailId(
 
 
                     Spacer(
-                        modifier = Modifier
-                            .height(15.dp)
+                        modifier = Modifier.height(15.dp)
                     )
 
 
@@ -259,8 +296,7 @@ fun DetailId(
 
 
                     Row(
-                        modifier = Modifier
-                            .padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp)
 
 
                     ) {
@@ -277,12 +313,11 @@ fun DetailId(
                         Spacer(modifier = Modifier.width(10.dp))
 
                         repeat(5) { index ->
-                            Icon(
-                                painter = if (!starStates[index]) {
-                                    painterResource(id = R.drawable.star_outline)
-                                } else {
-                                    painterResource(id = R.drawable.star)
-                                },
+                            Icon(painter = if (!starStates[index]) {
+                                painterResource(id = R.drawable.star_outline)
+                            } else {
+                                painterResource(id = R.drawable.star)
+                            },
                                 contentDescription = null,
                                 modifier = Modifier
                                     .padding(top = 5.dp)
@@ -302,8 +337,7 @@ fun DetailId(
                                         starsCount = starStates.count { it }
 
                                     }
-                                    .layoutId(allStars)
-                            )
+                                    .layoutId(allStars))
 
                             if (index in 1..3) {
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -330,6 +364,18 @@ fun DetailId(
                                     if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
                                         viewModel.add(clothesId, starsCount)
 
+
+                                        scope.launch {
+
+
+                                            val newRate = viewModel.rateContentFlow.first()
+                                            //val newRateValue = newRate.value
+                                            val newRateValue = viewModel.rate(clothesId, newRate)
+                                            rate = newRateValue
+
+                                        }
+
+
                                         text = textFieldInput
                                         textFieldInput = ""
                                         starsCount = 0
@@ -350,63 +396,33 @@ fun DetailId(
                         placeholder = {
                             Text(
                                 "Partagez ici vos impressions sur cette pièce",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onTertiary,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiary,
                                 fontSize = 14.sp
                             )
 
-                                      },
-                        colors = OutlinedTextFieldDefaults.colors( unfocusedContainerColor = Color.Transparent )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
 
 
-
-                    }
                 }
             }
         }
     }
+}
 
 
-
-/**
 @Composable
-fun ratingStar(
-modifier: Modifier = Modifier,
-rating: Double,
-stars: Int = 5,
-
-
+fun Share(
+    text: String, context: Context, urlData: String
 ) {
-val filledStars = floor(rating).toInt()
-val unfilledStars = (stars - floor(rating)).toInt()
-val halfStar = !(rating.rem(1).equals(0.0))
-
-
-Row(modifier = modifier) {
-repeat(filledStars)
-{
-Icon(painter = painterResource(id = R.drawable.star), contentDescription = null)
-
-
-}
-if (halfStar) {
-
-
-Icon(
-painter = painterResource(id = R.drawable.star_half),
-contentDescription = null,
-
-)
-}
-repeat(unfilledStars) {
-Icon(painter = painterResource(id = R.drawable.star_outline), contentDescription = null)
-
+    val url = "$urlData?text=${java.net.URLEncoder.encode(text, "UTF-8")}"
+    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+        data = android.net.Uri.parse(url)
+    }
+    context.startActivity(intent)
 }
 
 
-}
-
-
-}**/
 

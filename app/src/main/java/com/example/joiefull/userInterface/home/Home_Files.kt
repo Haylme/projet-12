@@ -49,6 +49,7 @@ import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
+import kotlinx.serialization.Serializable
 
 
 @Composable

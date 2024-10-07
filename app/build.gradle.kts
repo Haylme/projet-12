@@ -88,6 +88,14 @@ android {
 
     dependencies {
 
+
+        implementation (libs.facebook.facebook.share)
+
+
+
+
+
+
         implementation(libs.coil.compose)
 
 
