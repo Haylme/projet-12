@@ -44,10 +44,10 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
     }
 
 
-    fun rate(clothesId: Int, usersRating: List<RateContent>): Int {
+    fun rate(clothesId: Int, usersRating: List<RateContent>): Double {
 
-        val response :Int
-        var sum = 0
+        val response :Double
+        var sum = 0.0
         val totalSize = usersRating.size
 
 
@@ -62,7 +62,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
 
 
         }else {
-            response = 0
+            response = 0.0
 
 
         }

@@ -1,5 +1,6 @@
 package com.example.joiefull.userInterface.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -78,6 +79,7 @@ fun HomeDisplay(viewModel: HomeViewModel = hiltViewModel(), navController: NavCo
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun RecyclerView(
 
@@ -97,9 +99,10 @@ fun RecyclerView(
         ) {
         items(itemClothe.size) { index ->
             val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
+            val rateValue:Double = String.format("%.1f", rate).toDouble()
             HomeUi(
                 clothesData = itemClothe[index],
-                rate = rate.toDouble(),
+                rate = rateValue,
                 navController = navController
 
 

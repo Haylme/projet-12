@@ -1,5 +1,6 @@
 package com.example.joiefull.userInterface.detail
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -27,7 +28,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -48,19 +47,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.fragment.app.FragmentManager.BackStackEntry
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
-import com.example.joiefull.contentData.RateContent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -92,6 +89,7 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DetailId(
     itemClothe: List<ClothesItem>, clothesId: Int,
@@ -106,9 +104,19 @@ fun DetailId(
     val rateValue = rateData.value
 
     val clotheData = itemClothe.find { it.id == clothesId }
+    var rate: Double
+
+    val checkIfEmpty = rateValue.any { it.id == clothesId }
 
 
-    var rate = viewModel.rate(clothesId, rateValue)
+    if (checkIfEmpty ) {
+        val initialRate = viewModel.rate(clothesId, rateValue)
+        rate = String.format("%.1f", initialRate).toDouble()
+    } else {
+
+        rate = 0.0
+    }
+
 
     var starsCount by remember { mutableIntStateOf(0) }
 
@@ -152,7 +160,7 @@ fun DetailId(
                             .padding(12.dp)
                             .clickable {
 
-                                navController.navigate("home")
+                                navController.navigate(NavigationItem.Home.route)
 
                             }
 
@@ -368,10 +376,14 @@ fun DetailId(
                                         scope.launch {
 
 
-                                            val newRate = viewModel.rateContentFlow.first()
-                                            //val newRateValue = newRate.value
-                                            val newRateValue = viewModel.rate(clothesId, newRate)
-                                            rate = newRateValue
+                                            val newRates = viewModel.rateContentFlow.first()
+                                            val newRateValue = viewModel.rate(clothesId, newRates)
+                                            val roundedNewRateValue: Double =
+                                                String
+                                                    .format("%.1f", newRateValue)
+                                                    .toDouble()
+
+                                            rate = roundedNewRateValue
 
                                         }
 
