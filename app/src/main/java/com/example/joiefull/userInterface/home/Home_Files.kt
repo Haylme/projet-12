@@ -46,7 +46,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
+import com.example.joiefull.Screen
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.Picture
 import com.example.joiefull.contentData.RateContent
@@ -98,7 +100,13 @@ fun RecyclerView(
 
         ) {
         items(itemClothe.size) { index ->
-            val rate = viewModel.rate(clothesId = itemClothe[index].id, usersRating = rateContent)
+            val clothesId = itemClothe[index].id
+
+
+            val filteredRatings = rateContent.filter { it.id == clothesId }
+
+
+            val rate = viewModel.rate(clothesId = clothesId, usersRating = filteredRatings)
             val rateValue:Double = String.format("%.1f", rate).toDouble()
             HomeUi(
                 clothesData = itemClothe[index],
@@ -190,10 +198,8 @@ fun HomeUi(
                     model = clothesData.picture.url,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            navController.navigate("detail/${clothesData.id}")
-                        },
+                        .fillMaxSize(),
+
                     contentScale = ContentScale.Crop
 
 

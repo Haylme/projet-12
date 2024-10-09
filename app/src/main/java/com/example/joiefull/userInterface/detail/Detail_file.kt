@@ -2,6 +2,8 @@ package com.example.joiefull.userInterface.detail
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,7 +57,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
@@ -63,17 +69,15 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
+fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), navController: NavController) {
     viewmodel.fetchAll()
     viewmodel.getRate()
 
     val clothesFullData = viewmodel.fullData.collectAsState()
 
-    // val rateContent = viewmodel.rateContentFlow.collectAsState(initial = emptyList())
 
     val fullDataClothes = clothesFullData.value
 
-    // val rate = rateContent.value
 
 
     val dataById = viewmodel.selectById(clothesId, fullDataClothes)
@@ -82,7 +86,7 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
     DetailId(
         itemClothe = dataById,
         clothesId = clothesId,
-        navController = NavController(LocalContext.current)
+        navController = navController
     )
 
 
@@ -92,8 +96,9 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel()) {
 @SuppressLint("DefaultLocale")
 @Composable
 fun DetailId(
-    itemClothe: List<ClothesItem>, clothesId: Int,
-    //rateContent: List<RateContent>,
+    itemClothe: List<ClothesItem>,
+    clothesId: Int,
+
     viewModel: DetailViewModel = hiltViewModel(), navController: NavController
 ) {
     val scope = rememberCoroutineScope()
@@ -124,6 +129,16 @@ fun DetailId(
     var textFieldInput by remember { mutableStateOf("") }
     val starStates = remember { mutableStateListOf(false, false, false, false, false) }
 
+
+ /**   val isDarkImage = remember { mutableStateOf(false) }
+
+    LaunchedEffect(clotheData?.picture?.url) {
+        clotheData?.picture?.url?.let { url ->
+            isDarkImage.value = ImageToneChecker(url,LocalContext.current)
+        }
+    }**/
+
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -153,14 +168,18 @@ fun DetailId(
                         )
                     }
 
-                    Icon(painter = painterResource(id = R.drawable.arrow_back),
+                    Icon(painter =
+
+                    painterResource(id = R.drawable.arrow_back),
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(12.dp)
                             .clickable {
 
-                                navController.navigate(NavigationItem.Home.route)
+                                navController.popBackStack()
+
+
 
                             }
 
@@ -437,4 +456,39 @@ fun Share(
 }
 
 
+/**
+
+@Composable
+suspend fun checkImageTone(imageUrl: String, context: Context): Boolean {
+    val loader = ImageLoader(context)
+    val request = ImageRequest.Builder(context)
+        .data(imageUrl)
+        .allowHardware(false) // Disable hardware bitmaps.
+        .build()
+
+    val result = (loader.execute(request) as? SuccessResult)?.drawable
+    val bitmap = (result as? BitmapDrawable)?.bitmap
+
+    return bitmap?.let { isBitmapDark(it) } ?: false
+}
+
+fun isBitmapDark(bitmap: Bitmap): Boolean {
+    var darkPixels = 0
+    val totalPixels = bitmap.width * bitmap.height
+
+    for (x in 0 until bitmap.width) {
+        for (y in 0 until bitmap.height) {
+            val pixel = bitmap.getPixel(x, y)
+            val r = android.graphics.Color.red(pixel)
+            val g = android.graphics.Color.green(pixel)
+            val b = android.graphics.Color.blue(pixel)
+            val brightness = (r * 0.299 + g * 0.587 + b * 0.114).toInt()
+            if (brightness < 128) {
+                darkPixels++
+            }
+        }
+    }
+
+    return darkPixels > totalPixels / 2
+}**/
 
