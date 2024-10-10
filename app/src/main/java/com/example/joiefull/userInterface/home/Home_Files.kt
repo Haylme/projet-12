@@ -399,31 +399,3 @@ fun PreviewRecyclerView() {
     )
 
 }
-/**
-(
-
-constraintSet = ConstraintSet {
-
-val image = createRefFor("image")
-val nameClothes = createRefFor("nameClothes")
-val priceClothes = createRefFor("priceClothes")
-val originalPriceClothes = createRefFor("originalPriceClothes")
-val rating = createRefFor("rating")
-val star = createRefFor("star")
-val categoryClothes = createRefFor("categoryClothes")
-
-constrain(image) {
-top.linkTo(parent.top)
-start.linkTo(parent.start)
-}
-
-constrain(categoryClothes) {
-start.linkTo(image.start)
-bottom.linkTo(image.top)
-
-}
-
-}
-
-
-)**/
