@@ -2,8 +2,6 @@ package com.example.joiefull.userInterface.detail
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +28,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -48,8 +45,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -57,19 +54,17 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import com.example.joiefull.NavigationItem
 import com.example.joiefull.R
 import com.example.joiefull.contentData.ClothesItem
+import com.example.joiefull.responsive.WindowInfo
+import com.example.joiefull.responsive.rememberWindowInfo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), navController: NavController) {
+fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), navController: NavController,modifier: Modifier = Modifier) {
     viewmodel.fetchAll()
     viewmodel.getRate()
 
@@ -86,7 +81,8 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), n
     DetailId(
         itemClothe = dataById,
         clothesId = clothesId,
-        navController = navController
+        navController = navController,
+
     )
 
 
@@ -130,317 +126,610 @@ fun DetailId(
     val starStates = remember { mutableStateListOf(false, false, false, false, false) }
 
 
- /**   val isDarkImage = remember { mutableStateOf(false) }
 
-    LaunchedEffect(clotheData?.picture?.url) {
-        clotheData?.picture?.url?.let { url ->
-            isDarkImage.value = ImageToneChecker(url,LocalContext.current)
-        }
-    }**/
+    val windowInfo = rememberWindowInfo()
+    if (windowInfo.screenWidth == WindowInfo.WindowType.Phone) {
 
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
-    ) {
-        item {
-            ConstraintLayout(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes, textField, editTextField, profilpicture, allStars) = createRefs()
-
-                Box(modifier = Modifier
-                    .size(width = 328.dp, height = 431.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .constrainAs(image) {
-                        top.linkTo(parent.top)
-
-                    }
-
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+        ) {
+            item {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (clotheData != null) {
-                        AsyncImage(
-                            model = clotheData.picture.url,
+                    val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes, textField, editTextField, profilpicture, allStars) = createRefs()
+
+                    Box(modifier = Modifier
+                        .size(width = 328.dp, height = 431.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .constrainAs(image) {
+                            top.linkTo(parent.top)
+
+                        }
+
+                    ) {
+                        if (clotheData != null) {
+                            AsyncImage(
+                                model = clotheData.picture.url,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        Icon(painter =
+
+                        painterResource(id = R.drawable.arrow_back),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(12.dp)
+                                .clickable {
+
+                                    navController.popBackStack()
+
+
+
+                                }
+
+
                         )
+
+                        Icon(painter = painterResource(id = R.drawable.share),
+                            contentDescription = null,
+
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(12.dp)
+                                .clickable {
+
+
+                                })
+
+                        Card(
+                            modifier = Modifier
+
+                                .align(Alignment.BottomEnd)
+                                .padding(20.dp)
+                                .height(31.dp)
+                                .widthIn(70.dp),
+                            shape = RoundedCornerShape(34.dp),
+                        ) {
+                            var isClickable by remember { mutableStateOf(false) }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                if (clotheData != null) {
+                                    Image(painter = if (!isClickable) {
+                                        painterResource(id = R.drawable.fav_empty)
+                                    } else {
+                                        painterResource(id = R.drawable.fav_full)
+                                    },
+                                        contentDescription = clotheData.picture.description,
+                                        modifier = Modifier.clickable { isClickable = !isClickable })
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                if (clotheData != null) {
+                                    Text(
+                                        text = clotheData.likes.toString(),
+                                        color = Color.Black,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
                     }
 
-                    Icon(painter =
-
-                    painterResource(id = R.drawable.arrow_back),
-                        contentDescription = null,
+                    Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
                         modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(12.dp)
-                            .clickable {
-
-                                navController.popBackStack()
-
-
-
-                            }
-
-
-                    )
-
-                    Icon(painter = painterResource(id = R.drawable.share),
-                        contentDescription = null,
-
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(12.dp)
-                            .clickable {
-
-
-                            })
-
-                    Card(
-                        modifier = Modifier
-
-                            .align(Alignment.BottomEnd)
-                            .padding(20.dp)
-                            .height(31.dp)
-                            .widthIn(70.dp),
-                        shape = RoundedCornerShape(34.dp),
-                    ) {
-                        var isClickable by remember { mutableStateOf(false) }
+                            .padding(top = 8.dp)
+                            .constrainAs(categoryClothes) {
+                                top.linkTo(image.bottom)
+                            }) {
 
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier
+
+                                .width(328.dp), horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             if (clotheData != null) {
-                                Image(painter = if (!isClickable) {
-                                    painterResource(id = R.drawable.fav_empty)
-                                } else {
-                                    painterResource(id = R.drawable.fav_full)
-                                },
-                                    contentDescription = clotheData.picture.description,
-                                    modifier = Modifier.clickable { isClickable = !isClickable })
+                                Text(
+                                    text = clotheData.name,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .layoutId(nameClothes)
+                                        .weight(1f)
+                                        .padding(start = 4.dp)
+                                )
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
 
-                            if (clotheData != null) {
+                            Row(
+                                modifier = Modifier.padding(end = 8.dp)
+
+                            ) {
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.star),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = clotheData.likes.toString(),
-                                    color = Color.Black,
-                                    style = MaterialTheme.typography.bodySmall
+                                    text = rate.toString(),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.layoutId(rating)
                                 )
                             }
                         }
-                    }
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .constrainAs(categoryClothes) {
-                            top.linkTo(image.bottom)
-                        }) {
-
-                    Row(
-                        modifier = Modifier
-
-                            .width(328.dp), horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        if (clotheData != null) {
-                            Text(
-                                text = clotheData.name,
-                                fontSize = 18.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier
-                                    .layoutId(nameClothes)
-                                    .weight(1f)
-                                    .padding(start = 4.dp)
-                            )
-                        }
 
 
                         Row(
-                            modifier = Modifier.padding(end = 8.dp)
 
-                        ) {
-
-                            Image(
-                                painter = painterResource(id = R.drawable.star),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = rate.toString(),
-                                fontSize = 18.sp,
-                                modifier = Modifier.layoutId(rating)
-                            )
-                        }
-                    }
-
-
-                    Row(
-
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .width(328.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        if (clotheData != null) {
-                            Text(
-                                text = clotheData.price.toString(),
-                                fontSize = 18.sp,
-                                modifier = Modifier
-                                    .layoutId(priceClothes)
-                                    .padding(start = 4.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(18.dp))
-
-                        if (clotheData != null) {
-                            Text(
-                                text = clotheData.original_price.toString(),
-                                textDecoration = TextDecoration.LineThrough,
-                                fontSize = 18.sp,
-                                modifier = Modifier
-                                    .layoutId(originalPriceClothes)
-                                    .padding(end = 4.dp)
-                            )
-                        }
-                    }
-
-
-
-
-                    Spacer(
-                        modifier = Modifier.height(15.dp)
-                    )
-
-
-                    Text(text = text)
-
-
-                    Row(
-                        modifier = Modifier.padding(top = 12.dp)
-
-
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.kitano),
-                            contentDescription = null,
                             modifier = Modifier
-                                .clip(CircleShape)
-                                .size(40.dp)
-                                .layoutId(profilpicture),
-                            contentScale = ContentScale.Crop
+                                .padding(top = 8.dp)
+                                .width(328.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (clotheData != null) {
+                                Text(
+                                    text = clotheData.price.toString(),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .layoutId(priceClothes)
+                                        .padding(start = 4.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(18.dp))
+
+                            if (clotheData != null) {
+                                Text(
+                                    text = clotheData.original_price.toString(),
+                                    textDecoration = TextDecoration.LineThrough,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .layoutId(originalPriceClothes)
+                                        .padding(end = 4.dp)
+                                )
+                            }
+                        }
+
+
+
+
+                        Spacer(
+                            modifier = Modifier.height(15.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(10.dp))
 
-                        repeat(5) { index ->
-                            Icon(painter = if (!starStates[index]) {
-                                painterResource(id = R.drawable.star_outline)
-                            } else {
-                                painterResource(id = R.drawable.star)
-                            },
+                        Text(text = text)
+
+
+                        Row(
+                            modifier = Modifier.padding(top = 12.dp)
+
+
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.kitano),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .padding(top = 5.dp)
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                                    .layoutId(profilpicture),
+                                contentScale = ContentScale.Crop
+                            )
 
-                                    .clickable {
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            repeat(5) { index ->
+                                Icon(painter = if (!starStates[index]) {
+                                    painterResource(id = R.drawable.star_outline)
+                                } else {
+                                    painterResource(id = R.drawable.star)
+                                },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(top = 5.dp)
+
+                                        .clickable {
 
 
-                                        for (i in 0..index) {
+                                            for (i in 0..index) {
 
-                                            starStates[i] = true
+                                                starStates[i] = true
+                                            }
+                                            for (i in index + 1 until starStates.size) {
+
+                                                starStates[i] = false
+                                            }
+
+                                            starsCount = starStates.count { it }
+
                                         }
-                                        for (i in index + 1 until starStates.size) {
+                                        .layoutId(allStars))
 
-                                            starStates[i] = false
+                                if (index in 1..3) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(22.dp))
+
+                        OutlinedTextField(
+
+                            value = textFieldInput,
+                            onValueChange = { newText -> textFieldInput = newText },
+                            modifier = Modifier
+                                .layoutId(textField)
+                                .widthIn(328.dp)
+                                .heightIn(53.dp)
+                                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
+                                // .padding(top = 20.dp)
+                                .onKeyEvent {
+                                    if (starsCount > 0) {
+
+
+                                        if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                                            viewModel.add(clothesId, starsCount)
+
+
+                                            scope.launch {
+
+
+                                                val newRates = viewModel.rateContentFlow.first()
+                                                val newRateValue = viewModel.rate(clothesId, newRates)
+                                                val roundedNewRateValue: Double =
+                                                    String
+                                                        .format("%.1f", newRateValue)
+                                                        .toDouble()
+
+                                                rate = roundedNewRateValue
+
+                                            }
+
+
+                                            text = textFieldInput
+                                            textFieldInput = ""
+                                            starsCount = 0
+
+                                            for (j in starStates.indices) {
+                                                starStates[j] = false
+
+                                            }
+
+                                            true
+                                        } else {
+                                            false
                                         }
-
-                                        starsCount = starStates.count { it }
-
+                                    } else {
+                                        false
                                     }
-                                    .layoutId(allStars))
+                                },
+                            placeholder = {
+                                Text(
+                                    "Partagez ici vos impressions sur cette pièce",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onTertiary,
+                                    fontSize = 14.sp
+                                )
 
-                            if (index in 1..3) {
-                                Spacer(modifier = Modifier.width(6.dp))
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                        )
+
+
+                    }
+                }
+            }
+        }
+
+
+    }else {
+
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+        ) {
+            item {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val (image, nameClothes, priceClothes, originalPriceClothes, rating, star, categoryClothes, textField, editTextField, profilpicture, allStars) = createRefs()
+
+                    Box(modifier = Modifier
+                        .size(width = 451.dp, height = 408.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .constrainAs(image) {
+                            top.linkTo(parent.top)
+
+                        }
+
+                    ) {
+                        if (clotheData != null) {
+                            AsyncImage(
+                                model = clotheData.picture.url,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+
+
+                        Icon(painter = painterResource(id = R.drawable.share),
+                            contentDescription = null,
+
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(12.dp)
+                                .clickable {
+
+
+                                })
+
+                        Card(
+                            modifier = Modifier
+
+                                .align(Alignment.BottomEnd)
+                                .padding(20.dp)
+                                .height(31.dp)
+                                .widthIn(70.dp),
+                            shape = RoundedCornerShape(34.dp),
+                        ) {
+                            var isClickable by remember { mutableStateOf(false) }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                if (clotheData != null) {
+                                    Image(painter = if (!isClickable) {
+                                        painterResource(id = R.drawable.fav_empty)
+                                    } else {
+                                        painterResource(id = R.drawable.fav_full)
+                                    },
+                                        contentDescription = clotheData.picture.description,
+                                        modifier = Modifier.clickable { isClickable = !isClickable })
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                if (clotheData != null) {
+                                    Text(
+                                        text = clotheData.likes.toString(),
+                                        color = Color.Black,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(22.dp))
-
-                    OutlinedTextField(
-
-                        value = textFieldInput,
-                        onValueChange = { newText -> textFieldInput = newText },
+                    Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
                         modifier = Modifier
-                            .layoutId(textField)
-                            .widthIn(328.dp)
-                            .heightIn(53.dp)
-                            .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                            // .padding(top = 20.dp)
-                            .onKeyEvent {
-                                if (starsCount > 0) {
+                            .padding(top = 8.dp)
+                            .constrainAs(categoryClothes) {
+                                top.linkTo(image.bottom)
+                            }) {
+
+                        Row(
+                            modifier = Modifier
+
+                                .width(451.dp), horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (clotheData != null) {
+                                Text(
+                                    text = clotheData.name,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .layoutId(nameClothes)
+                                        .weight(1f)
+                                        .padding(start = 4.dp)
+                                )
+                            }
 
 
-                                    if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
-                                        viewModel.add(clothesId, starsCount)
+                            Row(
+                                modifier = Modifier.padding(end = 8.dp)
+
+                            ) {
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.star),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = rate.toString(),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.layoutId(rating)
+                                )
+                            }
+                        }
 
 
-                                        scope.launch {
+                        Row(
+
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .width(451.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (clotheData != null) {
+                                Text(
+                                    text = clotheData.price.toString(),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .layoutId(priceClothes)
+                                        .padding(start = 4.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(18.dp))
+
+                            if (clotheData != null) {
+                                Text(
+                                    text = clotheData.original_price.toString(),
+                                    textDecoration = TextDecoration.LineThrough,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .layoutId(originalPriceClothes)
+                                        .padding(end = 4.dp)
+                                )
+                            }
+                        }
 
 
-                                            val newRates = viewModel.rateContentFlow.first()
-                                            val newRateValue = viewModel.rate(clothesId, newRates)
-                                            val roundedNewRateValue: Double =
-                                                String
-                                                    .format("%.1f", newRateValue)
-                                                    .toDouble()
 
-                                            rate = roundedNewRateValue
+
+                        Spacer(
+                            modifier = Modifier.height(15.dp)
+                        )
+
+
+                        Text(text = text)
+
+
+                        Row(
+                            modifier = Modifier.padding(top = 12.dp)
+
+
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.kitano),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                                    .layoutId(profilpicture),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            repeat(5) { index ->
+                                Icon(painter = if (!starStates[index]) {
+                                    painterResource(id = R.drawable.star_outline)
+                                } else {
+                                    painterResource(id = R.drawable.star)
+                                },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(top = 5.dp)
+
+                                        .clickable {
+
+
+                                            for (i in 0..index) {
+
+                                                starStates[i] = true
+                                            }
+                                            for (i in index + 1 until starStates.size) {
+
+                                                starStates[i] = false
+                                            }
+
+                                            starsCount = starStates.count { it }
 
                                         }
+                                        .layoutId(allStars))
+
+                                if (index in 1..3) {
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(22.dp))
+
+                        OutlinedTextField(
+
+                            value = textFieldInput,
+                            onValueChange = { newText -> textFieldInput = newText },
+                            modifier = Modifier
+                                .layoutId(textField)
+                                .widthIn(451.dp)
+                                .heightIn(53.dp)
+                                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
+                                // .padding(top = 20.dp)
+                                .onKeyEvent {
+                                    if (starsCount > 0) {
 
 
-                                        text = textFieldInput
-                                        textFieldInput = ""
-                                        starsCount = 0
+                                        if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                                            viewModel.add(clothesId, starsCount)
 
-                                        for (j in starStates.indices) {
-                                            starStates[j] = false
 
+                                            scope.launch {
+
+
+                                                val newRates = viewModel.rateContentFlow.first()
+                                                val newRateValue = viewModel.rate(clothesId, newRates)
+                                                val roundedNewRateValue: Double =
+                                                    String
+                                                        .format("%.1f", newRateValue)
+                                                        .toDouble()
+
+                                                rate = roundedNewRateValue
+
+                                            }
+
+
+                                            text = textFieldInput
+                                            textFieldInput = ""
+                                            starsCount = 0
+
+                                            for (j in starStates.indices) {
+                                                starStates[j] = false
+
+                                            }
+
+                                            true
+                                        } else {
+                                            false
                                         }
-
-                                        true
                                     } else {
                                         false
                                     }
-                                } else {
-                                    false
-                                }
+                                },
+                            placeholder = {
+                                Text(
+                                    "Partagez ici vos impressions sur cette pièce",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onTertiary,
+                                    fontSize = 14.sp
+                                )
+
                             },
-                        placeholder = {
-                            Text(
-                                "Partagez ici vos impressions sur cette pièce",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onTertiary,
-                                fontSize = 14.sp
-                            )
-
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                    )
+                            colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                        )
 
 
+                    }
                 }
             }
         }
+
     }
+
+
 }
 
 

@@ -46,7 +46,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
 
     fun rate(clothesId: Int, usersRating: List<RateContent>): Double {
 
-        val response :Double
+        val response: Double
         var sum = 0.0
         val totalSize = usersRating.size
 
@@ -58,10 +58,10 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                     sum += item.starsRating
                 }
             }
-             response = sum / totalSize
+            response = sum / totalSize
 
 
-        }else {
+        } else {
             response = 0.0
 
 
@@ -96,7 +96,31 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
     }
 
 
+    private val _newId = MutableStateFlow<Int?>(null)
+    var newId:StateFlow<Int?> = _newId.asStateFlow()
+
+
+    fun fetchId (id: Int){
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+
+            _newId.value = id
+
+
+
+        }
+
+
+
+    }
+
+
+
 }
+
+
+
 
 
 
