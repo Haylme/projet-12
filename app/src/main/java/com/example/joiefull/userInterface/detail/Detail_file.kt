@@ -2,8 +2,9 @@ package com.example.joiefull.userInterface.detail
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +49,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -64,7 +69,11 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), navController: NavController,modifier: Modifier = Modifier) {
+fun DetailScreen(
+    clothesId: Int,
+    viewmodel: DetailViewModel = hiltViewModel(),
+    navController: NavController
+) {
     viewmodel.fetchAll()
     viewmodel.getRate()
 
@@ -72,7 +81,6 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), n
 
 
     val fullDataClothes = clothesFullData.value
-
 
 
     val dataById = viewmodel.selectById(clothesId, fullDataClothes)
@@ -83,7 +91,7 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), n
         clothesId = clothesId,
         navController = navController,
 
-    )
+        )
 
 
 }
@@ -91,44 +99,57 @@ fun DetailScreen(clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), n
 
 @SuppressLint("DefaultLocale")
 @Composable
+
 fun DetailId(
     itemClothe: List<ClothesItem>,
     clothesId: Int,
-
-    viewModel: DetailViewModel = hiltViewModel(), navController: NavController
+    viewModel: DetailViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-    val scope = rememberCoroutineScope()
+    var textFieldValue by remember { mutableStateOf("") }
+    var isTextFieldVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    viewModel.getRate()
-    val rateData = viewModel.rateContentFlow.collectAsState(initial = emptyList())
-
-    val rateValue = rateData.value
-
-    val clotheData = itemClothe.find { it.id == clothesId }
-    var rate: Double
-
-    val checkIfEmpty = rateValue.any { it.id == clothesId }
-
-
-    if (checkIfEmpty ) {
-        val initialRate = viewModel.rate(clothesId, rateValue)
-        rate = String.format("%.1f", initialRate).toDouble()
-    } else {
-
-        rate = 0.0
-    }
-
-
-    var starsCount by remember { mutableIntStateOf(0) }
-
-    var text by remember { mutableStateOf("") }
-    var textFieldInput by remember { mutableStateOf("") }
-    val starStates = remember { mutableStateListOf(false, false, false, false, false) }
-
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
     val windowInfo = rememberWindowInfo()
     if (windowInfo.screenWidth == WindowInfo.WindowType.Phone) {
+
+
+        val scope = rememberCoroutineScope()
+
+        viewModel.getRate()
+        val rateData = viewModel.rateContentFlow.collectAsState(initial = emptyList())
+
+        val rateValue = rateData.value
+
+        val clotheData = itemClothe.find { it.id == clothesId }
+        var rate by remember { mutableDoubleStateOf(0.0) }
+
+        val checkIfEmpty = rateValue.any { it.id == clothesId }
+
+
+
+
+        if (checkIfEmpty) {
+            val initialRate = viewModel.rate(clothesId, rateValue)
+            rate = String.format("%.1f", initialRate).toDouble()
+        } else {
+
+            rate = 0.0
+        }
+
+
+        var starsCount by remember { mutableIntStateOf(0) }
+
+        var text by remember { mutableStateOf("") }
+        var textFieldInput by remember { mutableStateOf("") }
+        val starStates = remember { mutableStateListOf(false, false, false, false, false) }
+
+
+
+
 
 
         LazyColumn(
@@ -136,6 +157,8 @@ fun DetailId(
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
+
+
             item {
                 ConstraintLayout(
                     modifier = Modifier.fillMaxWidth()
@@ -155,8 +178,16 @@ fun DetailId(
                             AsyncImage(
                                 model = clotheData.picture.url,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        isTextFieldVisible = false
+
+                                    }
+                                ,
+                                contentScale = ContentScale.Crop,
+
+
                             )
                         }
 
@@ -172,11 +203,12 @@ fun DetailId(
                                     navController.popBackStack()
 
 
-
                                 }
 
 
                         )
+
+
 
                         Icon(painter = painterResource(id = R.drawable.share),
                             contentDescription = null,
@@ -186,8 +218,63 @@ fun DetailId(
                                 .padding(12.dp)
                                 .clickable {
 
+                                    isTextFieldVisible = !isTextFieldVisible
 
                                 })
+
+                        if (isTextFieldVisible) {
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.5f))
+                            )
+
+
+                            OutlinedTextField(
+                                value = textFieldValue,
+                                onValueChange = { newText -> textFieldValue = newText },
+                                maxLines = 8,
+                                modifier = Modifier
+                                    .widthIn(328.dp)
+                                    .heightIn(53.dp)
+                                    .align(Alignment.Center)
+
+                                    .onKeyEvent {
+                                        if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+
+                                            shareButton(
+                                                context = context,
+                                                itemId = clothesId,
+                                                message = textFieldValue,
+                                                url = "https://www.example.com/item"
+                                            )
+
+                                            textFieldValue = ""
+
+
+
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    },
+                                shape = RoundedCornerShape(18.dp),
+                                placeholder = {
+
+                                    Text(
+                                        "Partagez ici vos impressions",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiary,
+                                        fontSize = 14.sp,)
+                                },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.White
+                                )
+                            )
+                        }
+
+
 
                         Card(
                             modifier = Modifier
@@ -211,7 +298,9 @@ fun DetailId(
                                         painterResource(id = R.drawable.fav_full)
                                     },
                                         contentDescription = clotheData.picture.description,
-                                        modifier = Modifier.clickable { isClickable = !isClickable })
+                                        modifier = Modifier.clickable {
+                                            isClickable = !isClickable
+                                        })
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -371,12 +460,12 @@ fun DetailId(
 
                             value = textFieldInput,
                             onValueChange = { newText -> textFieldInput = newText },
+                            maxLines = 8,
                             modifier = Modifier
                                 .layoutId(textField)
                                 .widthIn(328.dp)
                                 .heightIn(53.dp)
-                                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                                // .padding(top = 20.dp)
+
                                 .onKeyEvent {
                                     if (starsCount > 0) {
 
@@ -389,7 +478,8 @@ fun DetailId(
 
 
                                                 val newRates = viewModel.rateContentFlow.first()
-                                                val newRateValue = viewModel.rate(clothesId, newRates)
+                                                val newRateValue =
+                                                    viewModel.rate(clothesId, newRates)
                                                 val roundedNewRateValue: Double =
                                                     String
                                                         .format("%.1f", newRateValue)
@@ -417,6 +507,7 @@ fun DetailId(
                                         false
                                     }
                                 },
+                            shape = RoundedCornerShape(18.dp),
                             placeholder = {
                                 Text(
                                     "Partagez ici vos impressions sur cette pièce",
@@ -436,7 +527,48 @@ fun DetailId(
         }
 
 
-    }else {
+    } else {
+
+
+        val scope = rememberCoroutineScope()
+
+        viewModel.getRate()
+        val rateData = viewModel.rateContentFlow.collectAsState()
+
+        val rateValue = rateData.value
+
+        val clotheData = itemClothe.find { it.id == clothesId }
+        var rate by remember { mutableDoubleStateOf(0.0) }
+
+        val checkIfEmpty = rateValue.any { it.id == clothesId }
+
+
+
+
+        if (checkIfEmpty) {
+            val initialRate = viewModel.rate(clothesId, rateValue)
+
+
+
+            rate = String.format("%.1f", initialRate).toDouble()
+
+        } else {
+
+            rate = 0.0
+        }
+
+
+        var starsCount by remember { mutableIntStateOf(0) }
+
+        var text by remember { mutableStateOf("") }
+        var textFieldInput by remember { mutableStateOf("") }
+        val starStates = remember { mutableStateListOf(false, false, false, false, false) }
+
+
+
+
+
+
 
 
         LazyColumn(
@@ -503,7 +635,9 @@ fun DetailId(
                                         painterResource(id = R.drawable.fav_full)
                                     },
                                         contentDescription = clotheData.picture.description,
-                                        modifier = Modifier.clickable { isClickable = !isClickable })
+                                        modifier = Modifier.clickable {
+                                            isClickable = !isClickable
+                                        })
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -660,15 +794,16 @@ fun DetailId(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         OutlinedTextField(
+                            maxLines = 8,
 
                             value = textFieldInput,
                             onValueChange = { newText -> textFieldInput = newText },
                             modifier = Modifier
                                 .layoutId(textField)
+
                                 .widthIn(451.dp)
                                 .heightIn(53.dp)
-                                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                                // .padding(top = 20.dp)
+
                                 .onKeyEvent {
                                     if (starsCount > 0) {
 
@@ -681,7 +816,8 @@ fun DetailId(
 
 
                                                 val newRates = viewModel.rateContentFlow.first()
-                                                val newRateValue = viewModel.rate(clothesId, newRates)
+                                                val newRateValue =
+                                                    viewModel.rate(clothesId, newRates)
                                                 val roundedNewRateValue: Double =
                                                     String
                                                         .format("%.1f", newRateValue)
@@ -689,12 +825,15 @@ fun DetailId(
 
                                                 rate = roundedNewRateValue
 
+
                                             }
 
 
                                             text = textFieldInput
                                             textFieldInput = ""
                                             starsCount = 0
+
+                                            text = ""
 
                                             for (j in starStates.indices) {
                                                 starStates[j] = false
@@ -709,6 +848,7 @@ fun DetailId(
                                         false
                                     }
                                 },
+                            shape = RoundedCornerShape(18.dp),
                             placeholder = {
                                 Text(
                                     "Partagez ici vos impressions sur cette pièce",
@@ -732,16 +872,17 @@ fun DetailId(
 
 }
 
+fun shareButton(context: Context, itemId: Int, message: String, url: String) {
+    val appPageUrl = "$url/$itemId"
 
-@Composable
-fun Share(
-    text: String, context: Context, urlData: String
-) {
-    val url = "$urlData?text=${java.net.URLEncoder.encode(text, "UTF-8")}"
-    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-        data = android.net.Uri.parse(url)
+    val shareMessage = "$message: $appPageUrl"
+
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, shareMessage)
     }
-    context.startActivity(intent)
+
+    context.startActivity(Intent.createChooser(intent, "Share via"))
 }
 
 
@@ -749,35 +890,35 @@ fun Share(
 
 @Composable
 suspend fun checkImageTone(imageUrl: String, context: Context): Boolean {
-    val loader = ImageLoader(context)
-    val request = ImageRequest.Builder(context)
-        .data(imageUrl)
-        .allowHardware(false) // Disable hardware bitmaps.
-        .build()
+val loader = ImageLoader(context)
+val request = ImageRequest.Builder(context)
+.data(imageUrl)
+.allowHardware(false) // Disable hardware bitmaps.
+.build()
 
-    val result = (loader.execute(request) as? SuccessResult)?.drawable
-    val bitmap = (result as? BitmapDrawable)?.bitmap
+val result = (loader.execute(request) as? SuccessResult)?.drawable
+val bitmap = (result as? BitmapDrawable)?.bitmap
 
-    return bitmap?.let { isBitmapDark(it) } ?: false
+return bitmap?.let { isBitmapDark(it) } ?: false
 }
 
 fun isBitmapDark(bitmap: Bitmap): Boolean {
-    var darkPixels = 0
-    val totalPixels = bitmap.width * bitmap.height
+var darkPixels = 0
+val totalPixels = bitmap.width * bitmap.height
 
-    for (x in 0 until bitmap.width) {
-        for (y in 0 until bitmap.height) {
-            val pixel = bitmap.getPixel(x, y)
-            val r = android.graphics.Color.red(pixel)
-            val g = android.graphics.Color.green(pixel)
-            val b = android.graphics.Color.blue(pixel)
-            val brightness = (r * 0.299 + g * 0.587 + b * 0.114).toInt()
-            if (brightness < 128) {
-                darkPixels++
-            }
-        }
-    }
+for (x in 0 until bitmap.width) {
+for (y in 0 until bitmap.height) {
+val pixel = bitmap.getPixel(x, y)
+val r = android.graphics.Color.red(pixel)
+val g = android.graphics.Color.green(pixel)
+val b = android.graphics.Color.blue(pixel)
+val brightness = (r * 0.299 + g * 0.587 + b * 0.114).toInt()
+if (brightness < 128) {
+darkPixels++
+}
+}
+}
 
-    return darkPixels > totalPixels / 2
+return darkPixels > totalPixels / 2
 }**/
 

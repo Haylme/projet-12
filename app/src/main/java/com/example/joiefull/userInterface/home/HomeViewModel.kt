@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
         val response: Double
         var sum = 0.0
         val totalSize = usersRating.size
-
+        val dataSize = usersRating.filter { it.id == clothesId }.size
 
         if (totalSize > 0) {
             for (item in usersRating) {
@@ -58,7 +58,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                     sum += item.starsRating
                 }
             }
-            response = sum / totalSize
+            response = sum / dataSize
 
 
         } else {
@@ -91,7 +91,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                 }
             }
         }
-        result.sortedBy { it.category }
+
         return result
     }
 
@@ -114,6 +114,8 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
 
 
     }
+
+
 
 
 

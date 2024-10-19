@@ -1,4 +1,5 @@
 [versions]
+accompanistSwiperefreshVersion = "<version>"
 agp = "8.5.1"
 coilCompose = "2.0.0-rc01"
 converterGson = "2.9.0"
@@ -57,6 +58,7 @@ compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 facebook-facebook-share = { module = "com.facebook.android:facebook-share", version.ref = "facebookFacebookShare" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+google-accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefreshVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidVersion" }

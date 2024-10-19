@@ -164,7 +164,7 @@ fun RecyclerView(
                     DetailScreen(
                         clothesId = clothesId,
                         navController = navController,
-                        modifier = Modifier.fillMaxSize()
+
 
 
                     )
@@ -471,7 +471,7 @@ fun HomeUi(
 
 
                 )
-
+                var rateBoolValue = 0
 
                 Box(
                     modifier = Modifier
@@ -480,6 +480,8 @@ fun HomeUi(
                         .clickable {
 
                             viewModel.fetchId(clothesData.id)
+
+
 
 
                         }
