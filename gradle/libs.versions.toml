@@ -1,6 +1,7 @@
 [versions]
 accompanistSwiperefreshVersion = "<version>"
 agp = "8.5.1"
+androidxCoreSplashscreen = "1.0.1"
 coilCompose = "2.0.0-rc01"
 converterGson = "2.9.0"
 coreTesting = "2.2.0"
@@ -40,6 +41,7 @@ retrofit2KotlinxSerializationConverter = "0.8.0"
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragmentKtxVersion" }
 androidx-fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragmentKtxVersion" }

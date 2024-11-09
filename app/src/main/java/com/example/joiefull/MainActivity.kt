@@ -1,19 +1,19 @@
 package com.example.joiefull
 
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,23 +24,25 @@ import com.example.joiefull.responsive.rememberWindowInfo
 import com.example.joiefull.ui.theme.JoiefullTheme
 import com.example.joiefull.userInterface.detail.DetailScreen
 import com.example.joiefull.userInterface.home.HomeDisplay
-import com.example.joiefull.userInterface.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: HomeViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        installSplashScreen()
+
+        actionBar?.hide()
+
 
 
         setContent {
             JoiefullTheme {
-
 
 
                 Surface(color = MaterialTheme.colorScheme.background) {

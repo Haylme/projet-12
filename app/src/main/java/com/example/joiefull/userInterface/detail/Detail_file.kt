@@ -2,7 +2,9 @@ package com.example.joiefull.userInterface.detail
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,12 +52,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -70,9 +76,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DetailScreen(
-    clothesId: Int,
-    viewmodel: DetailViewModel = hiltViewModel(),
-    navController: NavController
+    clothesId: Int, viewmodel: DetailViewModel = hiltViewModel(), navController: NavController
 ) {
     viewmodel.fetchAll()
     viewmodel.getRate()
@@ -111,6 +115,18 @@ fun DetailId(
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val snackScope = rememberCoroutineScope()
+
+    val accessibilityManager = remember {
+        context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    }
+
+
+    val accessibility = remember {
+        context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    }
+    val isAccessibilityEnabled = accessibility.isEnabled
 
 
     val windowInfo = rememberWindowInfo()
@@ -177,18 +193,17 @@ fun DetailId(
                         if (clotheData != null) {
                             AsyncImage(
                                 model = clotheData.picture.url,
-                                contentDescription = null,
+                                contentDescription = clotheData.picture.description,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clickable {
                                         isTextFieldVisible = false
 
-                                    }
-                                ,
+                                    },
                                 contentScale = ContentScale.Crop,
 
 
-                            )
+                                )
                         }
 
                         Icon(painter =
@@ -204,6 +219,10 @@ fun DetailId(
 
 
                                 }
+                                .semantics {
+                                    contentDescription = "Retour à l'écran d'accueil"
+
+                                }
 
 
                         )
@@ -216,6 +235,12 @@ fun DetailId(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(12.dp)
+                                .semantics {
+                                    liveRegion = LiveRegionMode.Polite
+                                    contentDescription =
+                                        "Veuillez écrire un message et appuyé sur entré pour partager votre avis sur cette pièce"
+
+                                }
                                 .clickable {
 
                                     isTextFieldVisible = !isTextFieldVisible
@@ -234,11 +259,12 @@ fun DetailId(
                             OutlinedTextField(
                                 value = textFieldValue,
                                 onValueChange = { newText -> textFieldValue = newText },
-                                maxLines = 8,
+                                maxLines = 4,
                                 modifier = Modifier
                                     .widthIn(328.dp)
                                     .heightIn(53.dp)
                                     .align(Alignment.Center)
+                                    .background(Color.White)
 
                                     .onKeyEvent {
                                         if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
@@ -251,6 +277,14 @@ fun DetailId(
                                             )
 
                                             textFieldValue = ""
+
+                                            isTextFieldVisible = false
+
+                                            snackScope.launch {
+                                                snackbarHostState.showSnackbar("Vous avez partagé votre avis")
+
+                                            }
+
 
 
 
@@ -266,12 +300,11 @@ fun DetailId(
                                         "Partagez ici vos impressions",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onTertiary,
-                                        fontSize = 14.sp,)
+                                        fontSize = 14.sp,
+                                    )
                                 },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White
+
                                 )
-                            )
                         }
 
 
@@ -298,9 +331,19 @@ fun DetailId(
                                         painterResource(id = R.drawable.fav_full)
                                     },
                                         contentDescription = clotheData.picture.description,
-                                        modifier = Modifier.clickable {
-                                            isClickable = !isClickable
-                                        })
+                                        modifier = Modifier
+                                            .semantics {
+                                                liveRegion = LiveRegionMode.Polite
+                                                contentDescription = if (isClickable) {
+                                                    "Ajouté aux favoris"
+                                                } else {
+                                                    "Retiré des favoris"
+                                                }
+                                            }
+
+                                            .clickable {
+                                                isClickable = !isClickable
+                                            })
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -318,7 +361,7 @@ fun DetailId(
 
                     Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
                         modifier = Modifier
-                            .padding(top = 8.dp)
+                            .padding(top = 16.dp)
                             .constrainAs(categoryClothes) {
                                 top.linkTo(image.bottom)
                             }) {
@@ -421,35 +464,87 @@ fun DetailId(
 
                             Spacer(modifier = Modifier.width(10.dp))
 
+
+
+
+
+
+
                             repeat(5) { index ->
-                                Icon(painter = if (!starStates[index]) {
-                                    painterResource(id = R.drawable.star_outline)
+
+                                if (isAccessibilityEnabled) {
+
+                                    Icon(painter = if (!starStates[index]) {
+                                        painterResource(id = R.drawable.star_outline)
+                                    } else {
+                                        painterResource(id = R.drawable.star)
+                                    },
+                                        contentDescription = "Etoiles pour noter l'article sur cinq étoiles",
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .padding(top = 5.dp)
+
+                                            .clickable {
+
+
+                                                for (i in 0..index) {
+
+                                                    starStates[i] = true
+                                                }
+                                                for (i in index + 1 until starStates.size) {
+
+                                                    starStates[i] = false
+                                                }
+
+                                                starsCount = starStates.count { it }
+
+
+                                            }
+                                            .semantics {
+                                                contentDescription =
+                                                    " Vous avez donné une note de $starsCount étoiles"
+
+                                            }
+                                            .layoutId(allStars))
                                 } else {
-                                    painterResource(id = R.drawable.star)
-                                },
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(top = 5.dp)
-
-                                        .clickable {
 
 
-                                            for (i in 0..index) {
+                                    Icon(painter = if (!starStates[index]) {
+                                        painterResource(id = R.drawable.star_outline)
+                                    } else {
+                                        painterResource(id = R.drawable.star)
+                                    },
+                                        contentDescription = "Etoiles pour noter l'article sur cinq étoiles",
+                                        modifier = Modifier
+                                            .padding(top = 5.dp)
 
-                                                starStates[i] = true
+                                            .clickable {
+
+
+                                                for (i in 0..index) {
+
+                                                    starStates[i] = true
+                                                }
+                                                for (i in index + 1 until starStates.size) {
+
+                                                    starStates[i] = false
+                                                }
+
+                                                starsCount = starStates.count { it }
+
+
                                             }
-                                            for (i in index + 1 until starStates.size) {
+                                            .semantics {
+                                                contentDescription =
+                                                    " Vous avez donné une note de $starsCount étoiles"
 
-                                                starStates[i] = false
                                             }
+                                            .layoutId(allStars))
 
-                                            starsCount = starStates.count { it }
 
-                                        }
-                                        .layoutId(allStars))
-
-                                if (index in 1..3) {
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    if (index in 1..3) {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                    }
                                 }
                             }
                         }
@@ -457,26 +552,22 @@ fun DetailId(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         OutlinedTextField(
-
                             value = textFieldInput,
                             onValueChange = { newText -> textFieldInput = newText },
                             maxLines = 8,
                             modifier = Modifier
-                                .layoutId(textField)
                                 .widthIn(328.dp)
                                 .heightIn(53.dp)
-
+                                .semantics {
+                                    contentDescription =
+                                        "Veuillez écrire un commentaire sur cet article pour partager vos impressions puis appuyez sur entrée"
+                                }
                                 .onKeyEvent {
-                                    if (starsCount > 0) {
-
-
+                                    if (starsCount > 0 && textFieldInput.isNotEmpty()) {
                                         if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
                                             viewModel.add(clothesId, starsCount)
 
-
                                             scope.launch {
-
-
                                                 val newRates = viewModel.rateContentFlow.first()
                                                 val newRateValue =
                                                     viewModel.rate(clothesId, newRates)
@@ -484,21 +575,28 @@ fun DetailId(
                                                     String
                                                         .format("%.1f", newRateValue)
                                                         .toDouble()
-
                                                 rate = roundedNewRateValue
-
                                             }
 
+                                            val announcement =
+                                                "Vous avez envoyé votre commentaire et votre note sur l'article"
 
-                                            text = textFieldInput
+                                            fun sendAccessibilityEventWithText(message: String) {
+                                                val event = AccessibilityEvent
+                                                    .obtain()
+                                                    .apply {
+
+                                                        contentDescription = message
+                                                    }
+                                                accessibilityManager.sendAccessibilityEvent(event)
+                                            }
+
+                                            sendAccessibilityEventWithText(announcement)
+
+
                                             textFieldInput = ""
                                             starsCount = 0
-
-                                            for (j in starStates.indices) {
-                                                starStates[j] = false
-
-                                            }
-
+                                            // Reset star states if applicable
                                             true
                                         } else {
                                             false
@@ -512,15 +610,12 @@ fun DetailId(
                                 Text(
                                     "Partagez ici vos impressions sur cette pièce",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onTertiary,
+                                    color = Color.Black,
                                     fontSize = 14.sp
                                 )
-
                             },
                             colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                         )
-
-
                     }
                 }
             }
@@ -595,7 +690,12 @@ fun DetailId(
                             AsyncImage(
                                 model = clotheData.picture.url,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+
+                                        isTextFieldVisible = false
+                                    },
                                 contentScale = ContentScale.Crop
                             )
                         }
@@ -608,10 +708,96 @@ fun DetailId(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(12.dp)
-                                .clickable {
+                                .semantics {
+                                    liveRegion = LiveRegionMode.Polite
+                                    contentDescription =
+                                        "Veuillez écrire un message et appuyé sur entré pour partager votre avis sur cette pièce"
 
+                                }
+                                .clickable {
+                                    isTextFieldVisible = !isTextFieldVisible
+
+                                    val announcement =
+                                        "Veuillez écrire un message et appuyé sur entré pour partager votre avis sur cette pièce"
+
+                                    fun sendAccessibilityEventWithText(message: String) {
+                                        val event = AccessibilityEvent
+                                            .obtain()
+                                            .apply {
+
+                                                contentDescription = message
+                                            }
+                                        accessibilityManager.sendAccessibilityEvent(event)
+                                    }
+
+                                    sendAccessibilityEventWithText(announcement)
 
                                 })
+
+
+                        if (isTextFieldVisible) {
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.5f))
+                            )
+
+
+                            OutlinedTextField(
+                                value = textFieldValue,
+                                onValueChange = { newText -> textFieldValue = newText },
+                                maxLines = 4,
+                                modifier = Modifier
+                                    .widthIn(328.dp)
+                                    .heightIn(53.dp)
+                                    .align(Alignment.Center)
+                                    .background(
+                                        Color.White, shape = RoundedCornerShape(18.dp)
+                                    )
+                                    .onKeyEvent {
+                                        if (it.key == Key.Enter || it.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+
+                                            shareButton(
+                                                context = context,
+                                                itemId = clothesId,
+                                                message = textFieldValue,
+                                                url = "https://www.example.com/item"
+                                            )
+
+                                            textFieldValue = ""
+
+                                            isTextFieldVisible = false
+
+                                            snackScope.launch {
+                                                snackbarHostState.showSnackbar("Vous avez partagé votre avis")
+
+                                            }
+
+
+
+
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    },
+                                shape = RoundedCornerShape(18.dp),
+                                placeholder = {
+
+                                    Text(
+                                        "Partagez ici vos impressions",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Black,
+                                        fontSize = 14.sp,
+
+                                        )
+                                },
+
+                                )
+                        }
+
+
 
                         Card(
                             modifier = Modifier
@@ -635,9 +821,18 @@ fun DetailId(
                                         painterResource(id = R.drawable.fav_full)
                                     },
                                         contentDescription = clotheData.picture.description,
-                                        modifier = Modifier.clickable {
-                                            isClickable = !isClickable
-                                        })
+                                        modifier = Modifier
+                                            .semantics {
+                                                liveRegion = LiveRegionMode.Polite
+                                                contentDescription = if (isClickable) {
+                                                    "Ajouté aux favoris"
+                                                } else {
+                                                    "Retiré des favoris"
+                                                }
+                                            }
+                                            .clickable {
+                                                isClickable = !isClickable
+                                            })
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -655,7 +850,7 @@ fun DetailId(
 
                     Column(verticalArrangement = Arrangement.spacedBy((-8).dp),
                         modifier = Modifier
-                            .padding(top = 8.dp)
+                            .padding(top = 16.dp)
                             .constrainAs(categoryClothes) {
                                 top.linkTo(image.bottom)
                             }) {
@@ -783,6 +978,11 @@ fun DetailId(
                                             starsCount = starStates.count { it }
 
                                         }
+                                        .semantics {
+                                            contentDescription =
+                                                " Vous avez donné une note de $starsCount étoiles"
+
+                                        }
                                         .layoutId(allStars))
 
                                 if (index in 1..3) {
@@ -818,15 +1018,29 @@ fun DetailId(
                                                 val newRates = viewModel.rateContentFlow.first()
                                                 val newRateValue =
                                                     viewModel.rate(clothesId, newRates)
-                                                val roundedNewRateValue: Double =
-                                                    String
-                                                        .format("%.1f", newRateValue)
-                                                        .toDouble()
+                                                val roundedNewRateValue: Double = String
+                                                    .format("%.1f", newRateValue)
+                                                    .toDouble()
 
                                                 rate = roundedNewRateValue
 
 
                                             }
+
+                                            val announcement =
+                                                "Vous avez envoyé votre commentaire et votre note sur l'article"
+
+                                            fun sendAccessibilityEventWithText(message: String) {
+                                                val event = AccessibilityEvent
+                                                    .obtain()
+                                                    .apply {
+
+                                                        contentDescription = message
+                                                    }
+                                                accessibilityManager.sendAccessibilityEvent(event)
+                                            }
+
+                                            sendAccessibilityEventWithText(announcement)
 
 
                                             text = textFieldInput
@@ -853,13 +1067,13 @@ fun DetailId(
                                 Text(
                                     "Partagez ici vos impressions sur cette pièce",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onTertiary,
+                                    color = Color.Black,
                                     fontSize = 14.sp
                                 )
 
                             },
-                            colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                        )
+
+                            )
 
 
                     }
@@ -877,48 +1091,9 @@ fun shareButton(context: Context, itemId: Int, message: String, url: String) {
 
     val shareMessage = "$message: $appPageUrl"
 
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, shareMessage)
-    }
 
-    context.startActivity(Intent.createChooser(intent, "Share via"))
+    Toast.makeText(context, "Liens vers facebook partagé: $shareMessage", Toast.LENGTH_LONG)
+        .show()
 }
 
-
-/**
-
-@Composable
-suspend fun checkImageTone(imageUrl: String, context: Context): Boolean {
-val loader = ImageLoader(context)
-val request = ImageRequest.Builder(context)
-.data(imageUrl)
-.allowHardware(false) // Disable hardware bitmaps.
-.build()
-
-val result = (loader.execute(request) as? SuccessResult)?.drawable
-val bitmap = (result as? BitmapDrawable)?.bitmap
-
-return bitmap?.let { isBitmapDark(it) } ?: false
-}
-
-fun isBitmapDark(bitmap: Bitmap): Boolean {
-var darkPixels = 0
-val totalPixels = bitmap.width * bitmap.height
-
-for (x in 0 until bitmap.width) {
-for (y in 0 until bitmap.height) {
-val pixel = bitmap.getPixel(x, y)
-val r = android.graphics.Color.red(pixel)
-val g = android.graphics.Color.green(pixel)
-val b = android.graphics.Color.blue(pixel)
-val brightness = (r * 0.299 + g * 0.587 + b * 0.114).toInt()
-if (brightness < 128) {
-darkPixels++
-}
-}
-}
-
-return darkPixels > totalPixels / 2
-}**/
 

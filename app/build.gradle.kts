@@ -89,11 +89,11 @@ android {
     dependencies {
 
 
-        implementation (libs.facebook.facebook.share)
 
 
 
 
+        implementation (libs.androidx.core.splashscreen)
 
 
         implementation(libs.coil.compose)

@@ -35,6 +35,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.AccessibilityAction
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -166,8 +171,7 @@ fun RecyclerView(
                         navController = navController,
 
 
-
-                    )
+                        )
                 }
 
 
@@ -249,7 +253,7 @@ fun HomeUi(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .layoutId(categoryClothes)
-                        .padding(start = 8.dp)
+                        .padding(start = 8.dp, bottom = 10.dp)
 
 
                 )
@@ -265,7 +269,7 @@ fun HomeUi(
                 ) {
                     AsyncImage(
                         model = clothesData.picture.url,
-                        contentDescription = null,
+                        contentDescription = clothesData.picture.description,
                         modifier = Modifier.fillMaxSize(),
 
                         contentScale = ContentScale.Crop
@@ -297,9 +301,20 @@ fun HomeUi(
                                 painterResource(id = R.drawable.fav_full)
                             },
                                 contentDescription = clothesData.picture.description,
-                                modifier = Modifier.clickable {
-                                    isClickable = !isClickable
-                                })
+                                modifier = Modifier
+                                    .semantics {
+                                        liveRegion = LiveRegionMode.Polite
+                                        contentDescription = if (isClickable) {
+                                            "Ajouté aux favoris"
+                                        } else {
+                                            "Retiré des favoris"
+                                        }
+                                    }
+                                    .clickable {
+                                        isClickable = !isClickable
+
+
+                                    })
 
                             Spacer(modifier = Modifier.width(8.dp))
 
@@ -467,11 +482,10 @@ fun HomeUi(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .layoutId(categoryClothes)
-                        .padding(start = 8.dp)
+                        .padding(start = 8.dp, bottom = 10.dp)
 
 
                 )
-                var rateBoolValue = 0
 
                 Box(
                     modifier = Modifier
@@ -482,15 +496,13 @@ fun HomeUi(
                             viewModel.fetchId(clothesData.id)
 
 
-
-
                         }
                         .layoutId("image")
 
                 ) {
                     AsyncImage(
                         model = clothesData.picture.url,
-                        contentDescription = null,
+                        contentDescription = clothesData.picture.description,
                         modifier = Modifier.fillMaxSize(),
 
                         contentScale = ContentScale.Crop
@@ -522,7 +534,17 @@ fun HomeUi(
                                 painterResource(id = R.drawable.fav_full)
                             },
                                 contentDescription = clothesData.picture.description,
-                                modifier = Modifier.clickable {
+                                modifier = Modifier
+                                    .semantics {
+                                        liveRegion = LiveRegionMode.Polite
+                                        contentDescription = if (isClickable) {
+                                            "Ajouté aux favoris"
+                                        } else {
+                                            "Retiré des favoris"
+                                        }
+                                    }
+
+                                    .clickable {
                                     isClickable = !isClickable
                                 })
 
@@ -582,10 +604,11 @@ fun HomeUi(
 
                             //Spacer(modifier = Modifier.width(62.dp))
 
-                            Row (modifier = Modifier
+                            Row(
+                                modifier = Modifier
 
 
-                            ){
+                            ) {
 
                                 Image(
                                     painter = painterResource(id = R.drawable.star),

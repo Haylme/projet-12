@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Joiefull" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.joifull" parent="Theme.SplashScreen" >
+
+
+
+        <item name="windowSplashScreenBackground">#F99F43</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/joiefullletters</item>
+        <item name="postSplashScreenTheme">@android:style/Theme.Material.NoActionBar</item>
+
+
+
+
+    </style>
+
+
+
+
+
+
 </resources>
