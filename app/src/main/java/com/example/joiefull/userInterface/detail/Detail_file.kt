@@ -62,7 +62,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -299,7 +298,7 @@ fun DetailId(
                                     Text(
                                         "Partagez ici vos impressions",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onTertiary,
+                                        color = Color.Black,
                                         fontSize = 14.sp,
                                     )
                                 },
@@ -578,25 +577,34 @@ fun DetailId(
                                                 rate = roundedNewRateValue
                                             }
 
-                                            val announcement =
-                                                "Vous avez envoyé votre commentaire et votre note sur l'article"
-
-                                            fun sendAccessibilityEventWithText(message: String) {
-                                                val event = AccessibilityEvent
-                                                    .obtain()
-                                                    .apply {
-
-                                                        contentDescription = message
-                                                    }
-                                                accessibilityManager.sendAccessibilityEvent(event)
-                                            }
-
-                                            sendAccessibilityEventWithText(announcement)
-
-
+                                            text = textFieldInput
                                             textFieldInput = ""
                                             starsCount = 0
-                                            // Reset star states if applicable
+
+                                            for (j in starStates.indices) {
+                                                starStates[j] = false
+
+                                            }
+
+                                            if (isAccessibilityEnabled) {
+                                                val announcement =
+                                                    "Vous avez envoyé votre commentaire et votre note sur l'article"
+
+                                                fun sendAccessibilityEventWithText(message: String) {
+                                                    val event = AccessibilityEvent
+                                                        .obtain()
+                                                        .apply {
+
+                                                            contentDescription = message
+                                                        }
+                                                    accessibilityManager.sendAccessibilityEvent(
+                                                        event
+                                                    )
+                                                }
+
+                                                sendAccessibilityEventWithText(announcement)
+                                            }
+
                                             true
                                         } else {
                                             false
@@ -717,20 +725,23 @@ fun DetailId(
                                 .clickable {
                                     isTextFieldVisible = !isTextFieldVisible
 
-                                    val announcement =
-                                        "Veuillez écrire un message et appuyé sur entré pour partager votre avis sur cette pièce"
 
-                                    fun sendAccessibilityEventWithText(message: String) {
-                                        val event = AccessibilityEvent
-                                            .obtain()
-                                            .apply {
+                                    if (isAccessibilityEnabled) {
+                                        val announcement =
+                                            "Veuillez écrire un message et appuyé sur entré pour partager votre avis sur cette pièce"
 
-                                                contentDescription = message
-                                            }
-                                        accessibilityManager.sendAccessibilityEvent(event)
+                                        fun sendAccessibilityEventWithText(message: String) {
+                                            val event = AccessibilityEvent
+                                                .obtain()
+                                                .apply {
+
+                                                    contentDescription = message
+                                                }
+                                            accessibilityManager.sendAccessibilityEvent(event)
+                                        }
+
+                                        sendAccessibilityEventWithText(announcement)
                                     }
-
-                                    sendAccessibilityEventWithText(announcement)
 
                                 })
 
@@ -1027,27 +1038,31 @@ fun DetailId(
 
                                             }
 
-                                            val announcement =
-                                                "Vous avez envoyé votre commentaire et votre note sur l'article"
+                                            if (isAccessibilityEnabled) {
+                                                val announcement =
+                                                    "Vous avez envoyé votre commentaire et votre note sur l'article"
 
-                                            fun sendAccessibilityEventWithText(message: String) {
-                                                val event = AccessibilityEvent
-                                                    .obtain()
-                                                    .apply {
+                                                fun sendAccessibilityEventWithText(message: String) {
+                                                    val event = AccessibilityEvent
+                                                        .obtain()
+                                                        .apply {
 
-                                                        contentDescription = message
-                                                    }
-                                                accessibilityManager.sendAccessibilityEvent(event)
+                                                            contentDescription = message
+                                                        }
+                                                    accessibilityManager.sendAccessibilityEvent(
+                                                        event
+                                                    )
+                                                }
+
+                                                sendAccessibilityEventWithText(announcement)
                                             }
-
-                                            sendAccessibilityEventWithText(announcement)
 
 
                                             text = textFieldInput
                                             textFieldInput = ""
                                             starsCount = 0
 
-                                            text = ""
+                                          //  text = ""
 
                                             for (j in starStates.indices) {
                                                 starStates[j] = false

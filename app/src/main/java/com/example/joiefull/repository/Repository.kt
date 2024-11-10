@@ -2,11 +2,9 @@ package com.example.joiefull.repository
 
 import com.example.joiefull.contentData.ClothesItem
 import com.example.joiefull.contentData.RateContent
-import com.example.joiefull.retrofit.ApiService
 import com.example.joiefull.retrofit.CallApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 import javax.inject.Singleton
 
 
