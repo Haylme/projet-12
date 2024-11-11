@@ -965,39 +965,80 @@ fun DetailId(
                             Spacer(modifier = Modifier.width(10.dp))
 
                             repeat(5) { index ->
-                                Icon(painter = if (!starStates[index]) {
-                                    painterResource(id = R.drawable.star_outline)
+
+                                if (isAccessibilityEnabled) {
+
+                                    Icon(painter = if (!starStates[index]) {
+                                        painterResource(id = R.drawable.star_outline)
+                                    } else {
+                                        painterResource(id = R.drawable.star)
+                                    },
+                                        contentDescription = "Etoiles pour noter l'article sur cinq étoiles",
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .padding(top = 5.dp)
+
+                                            .clickable {
+
+
+                                                for (i in 0..index) {
+
+                                                    starStates[i] = true
+                                                }
+                                                for (i in index + 1 until starStates.size) {
+
+                                                    starStates[i] = false
+                                                }
+
+                                                starsCount = starStates.count { it }
+
+
+                                            }
+                                            .semantics {
+                                                contentDescription =
+                                                    " Vous avez donné une note de $starsCount étoiles"
+
+                                            }
+                                            .layoutId(allStars))
                                 } else {
-                                    painterResource(id = R.drawable.star)
-                                },
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(top = 5.dp)
-
-                                        .clickable {
 
 
-                                            for (i in 0..index) {
+                                    Icon(painter = if (!starStates[index]) {
+                                        painterResource(id = R.drawable.star_outline)
+                                    } else {
+                                        painterResource(id = R.drawable.star)
+                                    },
+                                        contentDescription = "Etoiles pour noter l'article sur cinq étoiles",
+                                        modifier = Modifier
+                                            .padding(top = 5.dp)
 
-                                                starStates[i] = true
+                                            .clickable {
+
+
+                                                for (i in 0..index) {
+
+                                                    starStates[i] = true
+                                                }
+                                                for (i in index + 1 until starStates.size) {
+
+                                                    starStates[i] = false
+                                                }
+
+                                                starsCount = starStates.count { it }
+
+
                                             }
-                                            for (i in index + 1 until starStates.size) {
+                                            .semantics {
+                                                contentDescription =
+                                                    " Vous avez donné une note de $starsCount étoiles"
 
-                                                starStates[i] = false
                                             }
+                                            .layoutId(allStars))
 
-                                            starsCount = starStates.count { it }
 
-                                        }
-                                        .semantics {
-                                            contentDescription =
-                                                " Vous avez donné une note de $starsCount étoiles"
-
-                                        }
-                                        .layoutId(allStars))
-
-                                if (index in 1..3) {
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                    if (index in 1..3) {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                    }
                                 }
                             }
                         }
@@ -1062,7 +1103,7 @@ fun DetailId(
                                             textFieldInput = ""
                                             starsCount = 0
 
-                                          //  text = ""
+                                            text = ""
 
                                             for (j in starStates.indices) {
                                                 starStates[j] = false
