@@ -32,6 +32,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -640,7 +641,9 @@ fun DetailId(
 
         val rateValue = rateData.value
 
-        val clotheData = itemClothe.find { it.id == clothesId }
+        var clotheData = itemClothe.find { it.id == clothesId }
+
+
         var rate by remember { mutableDoubleStateOf(0.0) }
 
         val checkIfEmpty = rateValue.any { it.id == clothesId }
@@ -669,6 +672,10 @@ fun DetailId(
 
 
 
+        LaunchedEffect(clothesId) {
+            clotheData = itemClothe.find { it.id == clothesId }
+            text = ""
+        }
 
 
 
@@ -696,7 +703,7 @@ fun DetailId(
                     ) {
                         if (clotheData != null) {
                             AsyncImage(
-                                model = clotheData.picture.url,
+                                model = clotheData!!.picture.url,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -831,7 +838,7 @@ fun DetailId(
                                     } else {
                                         painterResource(id = R.drawable.fav_full)
                                     },
-                                        contentDescription = clotheData.picture.description,
+                                        contentDescription = clotheData!!.picture.description,
                                         modifier = Modifier
                                             .semantics {
                                                 liveRegion = LiveRegionMode.Polite
@@ -850,7 +857,7 @@ fun DetailId(
 
                                 if (clotheData != null) {
                                     Text(
-                                        text = clotheData.likes.toString(),
+                                        text = clotheData!!.likes.toString(),
                                         color = Color.Black,
                                         style = MaterialTheme.typography.bodySmall
                                     )
@@ -873,7 +880,7 @@ fun DetailId(
                         ) {
                             if (clotheData != null) {
                                 Text(
-                                    text = clotheData.name,
+                                    text = clotheData!!.name,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1,
@@ -915,7 +922,7 @@ fun DetailId(
                         ) {
                             if (clotheData != null) {
                                 Text(
-                                    text = clotheData.price.toString(),
+                                    text = clotheData!!.price.toString(),
                                     fontSize = 18.sp,
                                     modifier = Modifier
                                         .layoutId(priceClothes)
@@ -926,7 +933,7 @@ fun DetailId(
 
                             if (clotheData != null) {
                                 Text(
-                                    text = clotheData.original_price.toString(),
+                                    text = clotheData!!.original_price.toString(),
                                     textDecoration = TextDecoration.LineThrough,
                                     fontSize = 18.sp,
                                     modifier = Modifier
@@ -944,7 +951,11 @@ fun DetailId(
                         )
 
 
-                        Text(text = text)
+                        Text(
+                            text = text
+
+
+                        )
 
 
                         Row(
@@ -1103,7 +1114,12 @@ fun DetailId(
                                             textFieldInput = ""
                                             starsCount = 0
 
-                                            text = ""
+
+
+
+
+
+
 
                                             for (j in starStates.indices) {
                                                 starStates[j] = false
